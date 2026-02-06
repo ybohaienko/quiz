@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="header">
+      <h1 class="title">Quiz</h1>
+      <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme (T)">Theme</button>
+    </header>
+
+    <main class="main">
+      <section id="quiz-section" class="quiz-section">
+        <p class="progress" id="progress" aria-live="polite"></p>
+        <article id="question-card" class="question-card" aria-labelledby="question-title">
+          <h2 id="question-title" class="question-title"></h2>
+          <div id="question-illustration" class="question-illustration" aria-hidden="true"></div>
+          <p class="instruction" id="instruction">Select the correct short explanation (1–4 or click):</p>
+          <ul id="options-list" class="options-list" role="listbox" aria-label="Answer options"></ul>
+        </article>
+      </section>
+
+      <section id="result-section" class="result-section hidden" aria-live="polite">
+        <div id="result-badge" class="result-badge"></div>
+        <article id="result-card" class="result-card">
+          <h2 id="result-title" class="result-title"></h2>
+          <div id="result-illustration" class="result-illustration" aria-hidden="true"></div>
+          <h3 class="result-heading">Short explanation</h3>
+          <p id="result-short" class="result-text"></p>
+          <h3 class="result-heading">Detailed explanation</h3>
+          <p id="result-detailed" class="result-text result-detailed"></p>
+        </article>
+        <button type="button" id="next-btn" class="btn btn-primary">Next question</button>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p class="hint">Keyboard: <kbd>1</kbd>–<kbd>4</kbd> select option, <kbd>Enter</kbd> next, <kbd>T</kbd> theme</p>
+    </footer>
+  </div>
+  <script type="module" src="dist/app.js"></script>
+</body>
+</html>
