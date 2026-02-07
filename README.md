@@ -4,11 +4,13 @@ A **standalone single-file** HTML quiz application. The main file is `template.h
 
 ## Features
 
-- **Question structure**: Title, short explanation, detailed explanation, illustration, priority
-- **Four options** per question (short explanations from different questions; one correct)
-- **Full reveal** after answering: correct/wrong badge and full question details
-- **Keyboard**: `1`–`4` select option, `Enter` next question, `T` toggle theme
-- **Dark/Light theme** with preference saved in `localStorage`
+- **Quiz | Learn tabs**: Quiz flow (dashboard → questions → summary) and a Learn page (reference topics, search, collapse/expand)
+- **Question structure**: Title, short explanation, detailed explanation, illustration (code/ASCII), priority
+- **Four options** per question (short explanations from different questions; one correct); labels 1–4 for keyboard
+- **Full reveal** after answering: correct/wrong badge and full question details; session summary with score %
+- **Failed questions** saved in `localStorage` and suggested first on the next run
+- **Keyboard**: `1`–`4` select option, `Enter` next/finish, `T` toggle theme
+- **Dark/Light theme** with preference saved; round theme toggle (☀ / ☾)
 - **Single file**: no external CSS or JS; works from `file://` or any static host
 
 ## Run
@@ -32,3 +34,14 @@ Edit the `QUESTIONS` array inside the `<script>` block in the HTML file. Each qu
 - `priority` – number
 
 Save the file and refresh the browser.
+
+## Publish on GitHub
+
+1. Create a new repository on [GitHub](https://github.com/new) (optional: add a description, leave “Add a README” unchecked if you already have one).
+2. If this project is not yet a git repo:  
+   `git init && git add . && git commit -m "Initial commit"`
+3. If the remote is not set:  
+   `git remote add origin https://github.com/YOUR_USERNAME/quiz.git`
+4. Push:  
+   `git push -u origin main`  
+   (Use your GitHub username and a personal access token or SSH when prompted.)
