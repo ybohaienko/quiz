@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#f5f5f0" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+  <title>Quiz</title>
+  <style>
+/* Quiz app – simple, robust, dark/light */
+:root {
+  --bg: #f5f5f0;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-muted: #555;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --correct: #15803d;
+  --wrong: #b91c1c;
+  --border: #e0e0e0;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --code-bg: #e8e8e4;
+  --code-border: #ccc;
+}
+[data-theme="dark"] {
+  --bg: #1a1a1a;
+  --surface: #2d2d2d;
+  --text: #f0f0f0;
+  --text-muted: #a0a0a0;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --correct: #22c55e;
+  --wrong: #ef4444;
+  --border: #404040;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --code-bg: #252525;
+  --code-border: #444;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{font-size:100%;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;overflow-x:hidden;}
+.app{max-width:42rem;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));padding-bottom:max(1rem,env(safe-area-inset-bottom));}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-top:env(safe-area-inset-top,0);flex-wrap:wrap;gap:0.5rem;}
+.title{margin:0;font-size:1.5rem;font-weight:700;}
+.header-actions{display:flex;align-items:center;gap:0.5rem;}
+.theme-toggle{width:2.75rem;height:2.75rem;min-width:2.75rem;min-height:2.75rem;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1.25rem;line-height:1;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.theme-toggle:hover{background:var(--border);}
+.main{flex:1;}
+.dashboard,.session-summary{background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:1.5rem;box-shadow:0 2px 8px var(--shadow);}
+.dashboard h2,.session-summary h2{margin:0 0 1rem;font-size:1.25rem;font-weight:600;}
+.dashboard p,.session-summary p{margin:0 0 0.75rem;font-size:0.9375rem;color:var(--text-muted);}
+.dashboard label{display:block;margin-bottom:0.25rem;font-size:0.875rem;font-weight:500;}
+.dashboard select{margin-bottom:1rem;padding:0.75rem 1rem;min-height:2.75rem;font-size:1rem;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:0.375rem;min-width:8rem;-webkit-appearance:none;appearance:none;cursor:pointer;}
+.dashboard .failed-hint{margin-bottom:1rem;padding:0.75rem;background:var(--code-bg);border:1px solid var(--code-border);border-radius:0.375rem;font-size:0.875rem;}
+.dashboard .failed-hint strong{color:var(--wrong);}
+.stats-chart{margin-bottom:1.25rem;}
+.stats-chart-bar{display:flex;height:1.75rem;border-radius:0.375rem;overflow:hidden;background:var(--border);}
+.stats-chart-segment{transition:width 0.3s ease;}
+.stats-chart-segment.segment-failed,.stats-chart-legend .dot-failed{background:var(--wrong);}
+.stats-chart-segment.segment-rest,.stats-chart-legend .dot-rest{background:var(--accent);}
+.stats-chart-segment.segment-correct,.stats-chart-legend .dot-correct{background:var(--correct);}
+.stats-chart-segment.segment-wrong,.stats-chart-legend .dot-wrong{background:var(--wrong);}
+.stats-chart-legend{display:flex;flex-wrap:wrap;gap:1rem;margin:0.5rem 0 0;font-size:0.8125rem;color:var(--text-muted);}
+.stats-chart-legend span{display:inline-flex;align-items:center;gap:0.35rem;}
+.stats-chart-legend .dot{width:0.5rem;height:0.5rem;border-radius:50%;}
+.session-summary .stats{margin:1rem 0;padding:0.75rem 1rem;background:var(--bg);border-radius:0.375rem;font-size:0.9375rem;}
+.session-summary .failed-list{margin:1rem 0;padding-left:1.25rem;font-size:0.9375rem;}
+.session-summary .failed-list li{margin:0.25rem 0;}
+.session-summary .next-tip{margin-top:1rem;font-size:0.875rem;color:var(--text-muted);}
+.progress{margin:0 0 1rem;font-size:0.875rem;color:var(--text-muted);}
+.quiz-stats{font-weight:500;}
+.quiz-stats .correct-num{color:var(--correct);}
+.quiz-stats .wrong-num{color:var(--wrong);}
+.question-card{background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:1.25rem;box-shadow:0 2px 8px var(--shadow);}
+.question-title{margin:0 0 1rem;font-size:1.25rem;font-weight:600;}
+.question-illustration,.result-illustration{margin-bottom:1rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:0.8125rem;line-height:1.45;white-space:pre-wrap;word-break:break-word;text-align:left;overflow-x:auto;padding:0.875rem 1rem;background:var(--code-bg);border:1px solid var(--code-border);border-radius:0.375rem;}
+.question-illustration:empty,.result-illustration:empty{display:none;}
+.instruction{margin:0 0 0.75rem;font-size:0.875rem;color:var(--text-muted);}
+.options-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.5rem;}
+.option{display:flex;align-items:flex-start;gap:0.5rem;width:100%;min-height:2.75rem;padding:0.75rem 1rem;text-align:left;font-size:1rem;background:var(--bg);color:var(--text);border:2px solid var(--border);border-radius:0.375rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.option-num{flex-shrink:0;font-weight:700;color:var(--text-muted);}
+.option:hover:not(.option--disabled),.option:focus-visible{border-color:var(--accent);outline:none;}
+.option--disabled{cursor:default;opacity:0.85;}
+.option--correct{border-color:var(--correct);background:rgba(21,128,61,0.12);}
+.option--wrong{border-color:var(--wrong);background:rgba(185,28,28,0.12);}
+.result-section{background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:1.25rem;box-shadow:0 2px 8px var(--shadow);position:relative;}
+.result-section.hidden{display:none;}
+.result-actions{margin-top:1rem;position:relative;z-index:2;cursor:pointer;}
+.result-section .btn-primary{position:relative;z-index:2;cursor:pointer;pointer-events:auto;}
+.result-badge{margin-bottom:1rem;padding:0.5rem 0.75rem;border-radius:0.375rem;font-weight:600;font-size:0.875rem;}
+.result-badge--correct{background:rgba(21,128,61,0.2);color:var(--correct);}
+.result-badge--wrong{background:rgba(185,28,28,0.2);color:var(--wrong);}
+.result-title{margin:0 0 0.75rem;font-size:1.25rem;font-weight:600;}
+.result-heading{margin:1rem 0 0.25rem;font-size:0.875rem;font-weight:600;color:var(--text-muted);}
+.result-heading:first-of-type{margin-top:0;}
+.result-text{margin:0;font-size:0.9375rem;}
+.result-detailed{color:var(--text-muted);}
+.btn{min-height:2.75rem;padding:0.75rem 1.25rem;font-size:1rem;font-weight:500;border:none;border-radius:0.375rem;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.btn-primary{margin-top:1rem;width:100%;background:var(--accent);color:white;}
+.btn-primary:hover,.btn-primary:focus-visible{background:var(--accent-hover);outline:none;}
+.footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);}
+.hint{margin:0;font-size:0.75rem;color:var(--text-muted);}
+.keyboard-tips{margin:0;font-size:0.8125rem;color:var(--text-muted);}
+.keyboard-tips strong{display:block;margin-bottom:0.25rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.03em;}
+.keyboard-tips ul{margin:0.25rem 0 0;padding-left:1.25rem;}
+.keyboard-tips li{margin:0.15rem 0;}
+kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1px solid var(--border);border-radius:0.25rem;}
+@media (max-width: 768px),(pointer: coarse){.keyboard-tips{display:none!important;}}
+@media (max-width: 480px){
+.app{padding-left:max(0.75rem,env(safe-area-inset-left));padding-right:max(0.75rem,env(safe-area-inset-right));}
+.dashboard,.session-summary{padding:1.25rem;}
+.question-card,.result-section{padding:1rem;}
+.title{font-size:1.25rem;}
+.dashboard h2,.session-summary h2{font-size:1.125rem;}
+.question-title,.result-title{font-size:1.125rem;}
+.options-list{gap:0.625rem;}
+.option{min-height:3rem;padding:0.875rem 1rem;}
+}
+@media (pointer: coarse){
+.option,.btn,.theme-toggle,.dashboard select{min-height:2.75rem;}
+.option{padding:0.875rem 1rem;}
+}
+.nav-tabs{display:flex;gap:0.5rem;margin:0;}
+.nav-tab{height:2.75rem;min-height:2.75rem;min-width:2.75rem;padding:0 0.6rem;display:inline-flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:600;border:1px solid var(--border);border-radius:0.375rem;background:var(--surface);color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.nav-tab:hover{border-color:var(--accent);}
+.nav-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
+.page{display:none;}
+.page.active{display:block;}
+.learn-intro{margin:0 0 1rem;font-size:0.9375rem;color:var(--text-muted);}
+.learn-search-row{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;margin-bottom:1rem;}
+.learn-search-row .learn-search-box{flex:1 1 12rem;min-width:0;min-height:2.5rem;padding:0.5rem 0.75rem;font-size:1rem;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:0.375rem;}
+.learn-search-row .learn-search-box::placeholder{color:var(--text-muted);}
+.learn-search-row .learn-count{font-size:0.875rem;color:var(--text-muted);white-space:nowrap;}
+.learn-search-row .learn-collapse-btn{min-height:2.5rem;padding:0.5rem 0.75rem;font-size:0.875rem;border:1px solid var(--border);border-radius:0.375rem;background:var(--surface);color:var(--text);cursor:pointer;}
+.learn-search-row .learn-collapse-btn:hover{border-color:var(--accent);}
+.learn-no-results{margin:0 0 1rem;font-size:0.9375rem;color:var(--text-muted);}
+.learn-list{list-style:none;margin:0;padding:0;}
+.learn-item{background:var(--surface);border:1px solid var(--border);border-radius:0.375rem;margin-bottom:0.5rem;box-shadow:0 1px 3px var(--shadow);overflow:hidden;}
+.learn-item.no-match{display:none;}
+.learn-btn{width:100%;text-align:left;padding:0.75rem 1rem;font-size:1rem;font-weight:600;border:none;background:none;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.learn-btn:hover{background:var(--bg);}
+.learn-btn::before{content:\"\\25B6 \";font-size:0.75em;opacity:0.7;}
+.learn-item.expanded .learn-btn::before{content:\"\\25BC \";}
+.learn-spoiler{display:none;padding:0 1rem 1rem;border-top:1px solid var(--border);}
+.learn-item.expanded .learn-spoiler{display:block;}
+.learn-spoiler p{margin:0.5rem 0 0;font-size:0.9375rem;color:var(--text);line-height:1.5;}
+.learn-spoiler p:first-child{margin-top:0;}
+.learn-spoiler pre{margin:0.75rem 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:0.8125rem;line-height:1.45;white-space:pre-wrap;word-break:break-word;padding:0.875rem 1rem;background:var(--code-bg);border:1px solid var(--code-border);border-radius:0.375rem;overflow-x:auto;}
+.hidden{display:none!important;}
+  </style>
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="header">
+      <h1 class="title">Quiz</h1>
+      <div class="header-actions">
+        <nav class="nav-tabs" role="tablist" aria-label="Quiz or reference">
+          <button type="button" id="tab-quiz" class="nav-tab active" role="tab" aria-selected="true" aria-controls="page-quiz">Quiz</button>
+          <button type="button" id="tab-learn" class="nav-tab" role="tab" aria-selected="false" aria-controls="page-learn">Learn</button>
+        </nav>
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark/light theme"></button>
+      </div>
+    </header>
+    <div id="page-quiz" class="page active" role="tabpanel">
+    <main class="main">
+      <section id="dashboard-section" class="dashboard-section" aria-label="Start learning">
+        <form id="dashboard-form" class="dashboard">
+          <h2 id="dashboard-title">Start learning</h2>
+          <div id="dashboard-chart" class="stats-chart" aria-hidden="true"></div>
+          <p id="dashboard-total">Total questions in the quiz: <strong id="total-count">0</strong></p>
+          <p>Choose how many questions to answer in this try:</p>
+          <label for="question-count">Number of questions</label>
+          <select id="question-count" aria-label="Number of questions for this try"></select>
+          <div id="failed-hint" class="failed-hint hidden"></div>
+          <button type="submit" id="start-btn" class="btn btn-primary">Start</button>
+        </form>
+      </section>
+      <section id="quiz-section" class="quiz-section hidden">
+        <p class="progress" id="progress" aria-live="polite"></p>
+        <article id="question-card" class="question-card" aria-labelledby="question-title">
+          <h2 id="question-title" class="question-title"></h2>
+          <div id="question-illustration" class="question-illustration" aria-hidden="true"></div>
+          <p class="instruction" id="instruction">Select the correct short explanation (1–4 or click):</p>
+          <ul id="options-list" class="options-list" role="listbox" aria-label="Answer options"></ul>
+        </article>
+      </section>
+      <section id="result-section" class="result-section hidden" aria-live="polite">
+        <div id="result-badge" class="result-badge"></div>
+        <article id="result-card" class="result-card">
+          <h2 id="result-title" class="result-title"></h2>
+          <div id="result-illustration" class="result-illustration" aria-hidden="true"></div>
+          <h3 class="result-heading">Short explanation</h3>
+          <p id="result-short" class="result-text"></p>
+          <h3 class="result-heading">Detailed explanation</h3>
+          <p id="result-detailed" class="result-text result-detailed"></p>
+        </article>
+        <form id="result-form" class="result-actions">
+          <button type="submit" id="next-btn" class="btn btn-primary">Next question</button>
+        </form>
+      </section>
+      <section id="session-summary-section" class="session-summary-section hidden" aria-live="polite">
+        <div class="dashboard session-summary">
+          <h2>Session complete</h2>
+          <div id="session-chart" class="stats-chart" aria-hidden="true"></div>
+          <div id="session-stats" class="stats"></div>
+          <div id="session-failed-wrap" class="hidden">
+            <p><strong>Questions to review (suggested first next try):</strong></p>
+            <ul id="session-failed-list" class="failed-list"></ul>
+          </div>
+          <p class="next-tip" id="session-next-tip">Failed questions will appear first when you start your next try.</p>
+          <button type="button" id="back-to-dashboard-btn" class="btn btn-primary">Back to dashboard</button>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="keyboard-tips" aria-label="Keyboard shortcuts">
+        <strong>Keyboard shortcuts</strong>
+        <ul>
+          <li><kbd>1</kbd>–<kbd>4</kbd> — select an answer</li>
+          <li><kbd>Enter</kbd> — Start (dashboard), Next / Finish (after answering)</li>
+          <li><kbd>T</kbd> — toggle dark/light theme</li>
+        </ul>
+      </div>
+    </footer>
+    </div>
+    <div id="page-learn" class="page learn-page" role="tabpanel" aria-labelledby="tab-learn" hidden>
+      <p class="learn-intro">Reference material for the quiz. Study these topics, then try the Quiz tab.</p>
+      <div class="learn-search-row">
+        <label for="learn-search-box" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Search topics</label>
+        <input type="text" id="learn-search-box" class="learn-search-box" placeholder="Search topics..." aria-label="Search topics" />
+        <span id="learn-count" class="learn-count">0</span>
+        <button type="button" id="learn-collapse-btn" class="learn-collapse-btn">Collapse all</button>
+        <button type="button" id="learn-expand-btn" class="learn-collapse-btn">Expand all</button>
+      </div>
+      <p id="learn-no-results" class="learn-no-results hidden">No topics match. Try different keywords.</p>
+      <ul id="learn-list" class="learn-list"></ul>
+    </div>
+  </div>
+  <script>
+(function () {
+  var STORAGE_THEME_KEY = "quiz-theme";
+  var STORAGE_FAILED_KEY = "quiz-failed-ids";
+
+  var QUESTIONS = [
+    { id: "q1", title: "What is the capital of France?", shortExplanation: "The capital and largest city of France.", detailedExplanation: "Paris is the capital and most populous city of France. It is known for the Eiffel Tower, the Louvre, and its role as a global center for art, fashion, and culture.", illustration: "const country = {\n  name: \"France\",\n  capital: \"Paris\",\n  population: 67_000_000\n};", priority: 1 },
+    { id: "q2", title: "Which planet is known as the Red Planet?", shortExplanation: "The fourth planet from the Sun, named for its reddish appearance.", detailedExplanation: "Mars is the fourth planet from the Sun and is often called the Red Planet due to iron oxide (rust) on its surface. It has been a major target for space exploration.", illustration: "  Sun\n   |\n   v\n  (1) (2) (3) (4)*  ...\n       Mars\n\n* 4th planet, red surface", priority: 2 },
+    { id: "q3", title: "What is photosynthesis?", shortExplanation: "The process by which plants convert light into chemical energy.", detailedExplanation: "Photosynthesis is the process used by plants, algae, and some bacteria to convert sunlight, water, and carbon dioxide into glucose and oxygen. It is the foundation of most food chains.", illustration: "6 CO2 + 6 H2O + light\n    --> C6H12O6 + 6 O2\n\n(carbon dioxide + water + light\n --> glucose + oxygen)", priority: 3 },
+    { id: "q4", title: "Who wrote 'Romeo and Juliet'?", shortExplanation: "The English playwright and poet from the late 16th century.", detailedExplanation: "William Shakespeare wrote 'Romeo and Juliet,' one of his most famous tragedies, early in his career. The play has been adapted countless times for stage, film, and other media.", illustration: "// Romeo and Juliet, Act 2 Scene 2\n\"What's in a name? That which we call a rose\nBy any other name would smell as sweet.\"\n\n-- William Shakespeare", priority: 4 },
+    { id: "q5", title: "What is the largest ocean on Earth?", shortExplanation: "The largest and deepest of Earth's five oceanic divisions.", detailedExplanation: "The Pacific Ocean is the largest and deepest ocean, covering about 63 million square miles. It extends from the Arctic in the north to the Antarctic in the south.", illustration: "Oceans by area (approx):\n\n  Pacific  ████████████████████  63M mi²\n  Atlantic ██████████████        41M mi²\n  Indian   ████████████          27M mi²\n  ...", priority: 5 },
+    { id: "q6", title: "What does CPU stand for?", shortExplanation: "The main component that executes instructions in a computer.", detailedExplanation: "CPU stands for Central Processing Unit. It is the primary component of a computer that performs most of the processing inside the computer by executing program instructions.", illustration: "CPU = Central Processing Unit\n\n  [ RAM ] <--> [ CPU ] <--> [ I/O ]\n                |\n           fetch, decode,\n           execute", priority: 6 }
+  ];
+
+  function escapeHtml(text) {
+    var div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function shuffle(array) {
+    var out = array.slice();
+    for (var i = out.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = out[i]; out[i] = out[j]; out[j] = t;
+    }
+    return out;
+  }
+
+  function pickWrongOptions(questions, correctQuestion, count) {
+    var others = questions.filter(function (q) { return q.id !== correctQuestion.id; });
+    return shuffle(others).slice(0, count).map(function (q) { return q.shortExplanation; });
+  }
+
+  function buildOptions(correct, all) {
+    var wrong = pickWrongOptions(all, correct, 3);
+    var options = [{ text: correct.shortExplanation, correct: true }].concat(wrong.map(function (text) { return { text: text, correct: false }; }));
+    return shuffle(options);
+  }
+
+  function parseFailedIds() {
+    try {
+      var raw = localStorage.getItem(STORAGE_FAILED_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function buildOrder(questions, count, failedIds) {
+    var total = questions.length;
+    var failedIndices = [];
+    var otherIndices = [];
+    for (var i = 0; i < total; i++) {
+      if (failedIds.indexOf(questions[i].id) !== -1) failedIndices.push(i);
+      else otherIndices.push(i);
+    }
+    return shuffle(failedIndices).concat(shuffle(otherIndices)).slice(0, count);
+  }
+
+  function QuizApp() {
+    var self = this;
+    this.questions = QUESTIONS.slice();
+    this.order = [];
+    this.selectedCount = 0;
+    this.index = 0;
+    this.currentOptions = [];
+    this.answered = false;
+    this.sessionResults = [];
+
+    this.el = {
+      dashboardSection: document.getElementById("dashboard-section"),
+      totalCount: document.getElementById("total-count"),
+      questionCount: document.getElementById("question-count"),
+      failedHint: document.getElementById("failed-hint"),
+      startBtn: document.getElementById("start-btn"),
+      progress: document.getElementById("progress"),
+      quizSection: document.getElementById("quiz-section"),
+      resultSection: document.getElementById("result-section"),
+      questionTitle: document.getElementById("question-title"),
+      questionIllustration: document.getElementById("question-illustration"),
+      optionsList: document.getElementById("options-list"),
+      resultBadge: document.getElementById("result-badge"),
+      resultTitle: document.getElementById("result-title"),
+      resultIllustration: document.getElementById("result-illustration"),
+      resultShort: document.getElementById("result-short"),
+      resultDetailed: document.getElementById("result-detailed"),
+      nextBtn: document.getElementById("next-btn"),
+      sessionSummarySection: document.getElementById("session-summary-section"),
+      sessionStats: document.getElementById("session-stats"),
+      sessionFailedWrap: document.getElementById("session-failed-wrap"),
+      sessionFailedList: document.getElementById("session-failed-list"),
+      sessionNextTip: document.getElementById("session-next-tip"),
+      dashboardChart: document.getElementById("dashboard-chart"),
+      sessionChart: document.getElementById("session-chart"),
+      backToDashboardBtn: document.getElementById("back-to-dashboard-btn"),
+      themeToggle: document.getElementById("theme-toggle")
+    };
+
+    if (this.questions.length < 4) throw new Error("At least 4 questions are required for the quiz.");
+
+    var stored = localStorage.getItem(STORAGE_THEME_KEY);
+    var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.setAttribute("data-theme", stored || (prefersDark ? "dark" : "light"));
+    updateThemeIcon();
+
+    document.addEventListener("keydown", function (e) {
+      var tag = document.activeElement && document.activeElement.tagName;
+      var inInput = tag === "INPUT" || tag === "TEXTAREA";
+      if (e.key === "t" || e.key === "T") {
+        if (!inInput) { self.toggleTheme(); e.preventDefault(); }
+        return;
+      }
+      if (e.key === "Enter" && !inInput) {
+        if (!self.el.dashboardSection.classList.contains("hidden")) {
+          self.startQuiz();
+          e.preventDefault();
+          return;
+        }
+        if (self.answered && !self.el.resultSection.classList.contains("hidden")) {
+          self.next();
+          e.preventDefault();
+          return;
+        }
+      }
+      if (self.answered) return;
+      var n = parseInt(e.key, 10);
+      if (n >= 1 && n <= 4) {
+        var option = self.el.optionsList.querySelector("[data-index=\"" + (n - 1) + "\"]");
+        if (option && !option.classList.contains("option--disabled")) { option.click(); e.preventDefault(); }
+      }
+    });
+
+    this.el.themeToggle.addEventListener("click", function () { self.toggleTheme(); });
+    document.getElementById("dashboard-form").addEventListener("submit", function (e) { e.preventDefault(); self.startQuiz(); });
+    document.getElementById("result-form").addEventListener("submit", function (e) { e.preventDefault(); self.next(); });
+    this.el.backToDashboardBtn.addEventListener("click", function () { self.showDashboard(); });
+    if (window.matchMedia("(pointer: fine)").matches) {
+      self.el.themeToggle.setAttribute("title", "Toggle dark/light theme (keyboard: T)");
+      self.el.nextBtn.setAttribute("title", "Next question (keyboard: Enter)");
+    }
+    document.getElementById("tab-quiz").addEventListener("click", function () { self.showPage("quiz"); });
+    document.getElementById("tab-learn").addEventListener("click", function () { self.showPage("learn"); });
+    this.showPage("quiz");
+    this.showDashboard();
+  };
+
+  QuizApp.prototype.showPage = function (name) {
+    var quizTab = document.getElementById("tab-quiz");
+    var learnTab = document.getElementById("tab-learn");
+    var quizPage = document.getElementById("page-quiz");
+    var learnPage = document.getElementById("page-learn");
+    if (name === "quiz") {
+      quizTab.classList.add("active");
+      quizTab.setAttribute("aria-selected", "true");
+      learnTab.classList.remove("active");
+      learnTab.setAttribute("aria-selected", "false");
+      quizPage.classList.add("active");
+      quizPage.removeAttribute("hidden");
+      learnPage.classList.remove("active");
+      learnPage.setAttribute("hidden", "");
+    } else {
+      learnTab.classList.add("active");
+      learnTab.setAttribute("aria-selected", "true");
+      quizTab.classList.remove("active");
+      quizTab.setAttribute("aria-selected", "false");
+      learnPage.classList.add("active");
+      learnPage.removeAttribute("hidden");
+      quizPage.classList.remove("active");
+      quizPage.setAttribute("hidden", "");
+      this.renderLearnPage();
+      document.getElementById("learn-search-box").focus();
+    }
+  };
+
+  QuizApp.prototype.renderLearnPage = function () {
+    var listEl = document.getElementById("learn-list");
+    if (listEl.hasAttribute("data-rendered")) {
+      this.filterLearnList();
+      return;
+    }
+    listEl.setAttribute("data-rendered", "true");
+    var sorted = this.questions.slice().sort(function (a, b) { return a.priority - b.priority; });
+    for (var i = 0; i < sorted.length; i++) {
+      var q = sorted[i];
+      var searchText = (q.title + " " + q.detailedExplanation + (q.illustration ? " " + q.illustration : "")).toLowerCase();
+      var li = document.createElement("li");
+      li.className = "learn-item";
+      li.id = "learn-" + q.id;
+      li.setAttribute("data-search", searchText);
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "learn-btn";
+      btn.textContent = q.title;
+      var spoiler = document.createElement("div");
+      spoiler.className = "learn-spoiler";
+      var p = document.createElement("p");
+      p.textContent = q.detailedExplanation;
+      spoiler.appendChild(p);
+      if (q.illustration) {
+        var pre = document.createElement("pre");
+        pre.textContent = q.illustration;
+        spoiler.appendChild(pre);
+      }
+      li.appendChild(btn);
+      li.appendChild(spoiler);
+      listEl.appendChild(li);
+    }
+    var self = this;
+    listEl.querySelectorAll(".learn-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var item = btn.closest(".learn-item");
+        item.classList.toggle("expanded");
+      });
+    });
+    document.getElementById("learn-collapse-btn").addEventListener("click", function () {
+      listEl.querySelectorAll(".learn-item.expanded").forEach(function (item) {
+        item.classList.remove("expanded");
+      });
+    });
+    document.getElementById("learn-expand-btn").addEventListener("click", function () {
+      listEl.querySelectorAll(".learn-item").forEach(function (item) {
+        if (!item.classList.contains("no-match")) item.classList.add("expanded");
+      });
+    });
+    var debounceFilter = debounce(function () { self.filterLearnList(); }, 150);
+    document.getElementById("learn-search-box").addEventListener("input", debounceFilter);
+    this.filterLearnList();
+  };
+
+  function debounce(fn, delay) {
+    var t = null;
+    return function () {
+      clearTimeout(t);
+      t = setTimeout(fn, delay);
+    };
+  }
+
+  QuizApp.prototype.filterLearnList = function () {
+    var searchBox = document.getElementById("learn-search-box");
+    var listEl = document.getElementById("learn-list");
+    var countEl = document.getElementById("learn-count");
+    var noResultsEl = document.getElementById("learn-no-results");
+    if (!searchBox || !listEl || !countEl) return;
+    var q = (searchBox.value || "").trim().toLowerCase();
+    var visible = 0;
+    listEl.querySelectorAll(".learn-item").forEach(function (item) {
+      var match = !q || item.getAttribute("data-search").indexOf(q) !== -1;
+      if (match) {
+        item.classList.remove("no-match");
+        visible++;
+      } else {
+        item.classList.add("no-match");
+      }
+    });
+    countEl.textContent = visible + " topic" + (visible !== 1 ? "s" : "");
+    if (noResultsEl) noResultsEl.classList.toggle("hidden", visible > 0);
+  };
+
+  QuizApp.prototype.toggleTheme = function () {
+    var current = document.documentElement.getAttribute("data-theme") || "light";
+    document.documentElement.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+    localStorage.setItem(STORAGE_THEME_KEY, current === "dark" ? "light" : "dark");
+    updateThemeIcon();
+  };
+
+  function updateThemeIcon() {
+    var theme = document.documentElement.getAttribute("data-theme") || "light";
+    var btn = document.getElementById("theme-toggle");
+    if (btn) btn.textContent = theme === "dark" ? "\u263E" : "\u2600";
+  }
+
+  QuizApp.prototype.showDashboard = function () {
+    var total = this.questions.length;
+    this.el.totalCount.textContent = String(total);
+    var failedIds = parseFailedIds();
+    var failedCount = failedIds.length;
+    var restCount = Math.max(0, total - failedCount);
+    var failedPct = total > 0 ? (failedCount / total) * 100 : 0;
+    var restPct = total > 0 ? (restCount / total) * 100 : 0;
+    this.el.dashboardChart.innerHTML = "<div class=\"stats-chart-bar\" role=\"img\" aria-label=\"Quiz pool: " + failedCount + " to review, " + restCount + " rest\"><div class=\"stats-chart-segment segment-failed\" style=\"width:" + failedPct + "%\"></div><div class=\"stats-chart-segment segment-rest\" style=\"width:" + restPct + "%\"></div></div><p class=\"stats-chart-legend\"><span><span class=\"dot dot-failed\" aria-hidden=\"true\"></span>To review: " + failedCount + "</span><span><span class=\"dot dot-rest\" aria-hidden=\"true\"></span>Rest: " + restCount + "</span></p>";
+    this.el.questionCount.innerHTML = "";
+    for (var n = 1; n <= total; n++) {
+      var opt = document.createElement("option");
+      opt.value = n;
+      opt.textContent = n === total ? n + " (all)" : String(n);
+      this.el.questionCount.appendChild(opt);
+    }
+    if (total > 0) this.el.questionCount.value = Math.min(5, total);
+    if (failedCount > 0) {
+      this.el.failedHint.textContent = failedCount + " question(s) need more practice. They will appear first in this try.";
+      this.el.failedHint.classList.remove("hidden");
+    } else {
+      this.el.failedHint.classList.add("hidden");
+    }
+    this.el.dashboardSection.classList.remove("hidden");
+    this.el.quizSection.classList.add("hidden");
+    this.el.resultSection.classList.add("hidden");
+    this.el.sessionSummarySection.classList.add("hidden");
+  };
+
+  QuizApp.prototype.startQuiz = function () {
+    var count = parseInt(this.el.questionCount.value, 10) || this.questions.length;
+    count = Math.max(1, Math.min(count, this.questions.length));
+    var failedIds = parseFailedIds();
+    this.order = buildOrder(this.questions, count, failedIds);
+    this.selectedCount = this.order.length;
+    this.index = 0;
+    this.sessionResults = [];
+    this.el.dashboardSection.classList.add("hidden");
+    this.el.quizSection.classList.remove("hidden");
+    this.el.sessionSummarySection.classList.add("hidden");
+    this.showQuestion();
+  };
+
+  QuizApp.prototype.getSessionStats = function () {
+    var correct = 0, wrong = 0, failedIds = [];
+    for (var i = 0; i < this.sessionResults.length; i++) {
+      if (this.sessionResults[i].correct) correct++; else { wrong++; failedIds.push(this.sessionResults[i].id); }
+    }
+    return { correct: correct, wrong: wrong, failedIds: failedIds };
+  };
+
+  QuizApp.prototype.showSessionSummary = function () {
+    var stats = this.getSessionStats();
+    localStorage.setItem(STORAGE_FAILED_KEY, JSON.stringify(stats.failedIds));
+    var total = this.sessionResults.length;
+    var correctPct = total > 0 ? (stats.correct / total) * 100 : 0;
+    var wrongPct = total > 0 ? (stats.wrong / total) * 100 : 0;
+    this.el.sessionChart.innerHTML = "<div class=\"stats-chart-bar\" role=\"img\" aria-label=\"Correct: " + stats.correct + ", Wrong: " + stats.wrong + "\"><div class=\"stats-chart-segment segment-correct\" style=\"width:" + correctPct + "%\"></div><div class=\"stats-chart-segment segment-wrong\" style=\"width:" + wrongPct + "%\"></div></div><p class=\"stats-chart-legend\"><span><span class=\"dot dot-correct\" aria-hidden=\"true\"></span>Correct: " + stats.correct + "</span><span><span class=\"dot dot-wrong\" aria-hidden=\"true\"></span>Wrong: " + stats.wrong + "</span></p>";
+    var pct = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
+    this.el.sessionStats.textContent = "Correct: " + stats.correct + " · Wrong: " + stats.wrong + " (of " + total + ") — " + pct + "%";
+    if (stats.failedIds.length > 0) {
+      this.el.sessionFailedWrap.classList.remove("hidden");
+      this.el.sessionFailedList.innerHTML = "";
+      var self = this;
+      stats.failedIds.forEach(function (id) {
+        var q = self.questions.filter(function (q) { return q.id === id; })[0];
+        if (q) {
+          var li = document.createElement("li");
+          li.textContent = q.title;
+          self.el.sessionFailedList.appendChild(li);
+        }
+      });
+      this.el.sessionNextTip.textContent = "These will be suggested first when you start your next try.";
+    } else {
+      this.el.sessionFailedWrap.classList.add("hidden");
+      this.el.sessionNextTip.textContent = "Great — no failed questions this time.";
+    }
+    this.el.quizSection.classList.add("hidden");
+    this.el.resultSection.classList.add("hidden");
+    this.el.sessionSummarySection.classList.remove("hidden");
+    this.el.backToDashboardBtn.focus();
+  };
+
+  QuizApp.prototype.showQuestion = function () {
+    this.answered = false;
+    var q = this.questions[this.order[this.index]];
+    this.currentOptions = buildOptions(q, this.questions);
+
+    var correctSoFar = 0, wrongSoFar = 0;
+    for (var i = 0; i < this.sessionResults.length; i++) {
+      if (this.sessionResults[i].correct) correctSoFar++; else wrongSoFar++;
+    }
+    this.el.progress.innerHTML = "Question " + (this.index + 1) + " of " + this.order.length + " · <span class=\"quiz-stats\">Correct: <span class=\"correct-num\">" + correctSoFar + "</span> · Wrong: <span class=\"wrong-num\">" + wrongSoFar + "</span></span>";
+    this.el.questionTitle.textContent = q.title;
+    this.el.questionIllustration.textContent = q.illustration || "";
+
+    this.el.optionsList.innerHTML = "";
+    var self = this;
+    this.currentOptions.forEach(function (opt, i) {
+      var li = document.createElement("li");
+      li.setAttribute("role", "option");
+      li.setAttribute("data-index", String(i));
+      li.className = "option";
+      li.innerHTML = "<span class=\"option-num\" aria-hidden=\"true\">" + (i + 1) + ".</span> " + escapeHtml(opt.text);
+      li.addEventListener("click", function () { self.selectOption(i); });
+      self.el.optionsList.appendChild(li);
+    });
+
+    this.el.quizSection.classList.remove("hidden");
+    this.el.resultSection.classList.add("hidden");
+    var isLast = this.index >= this.order.length - 1;
+    this.el.nextBtn.textContent = isLast ? "Finish" : "Next question";
+  };
+
+  QuizApp.prototype.selectOption = function (optionIndex) {
+    if (this.answered) return;
+    this.answered = true;
+
+    var opt = this.currentOptions[optionIndex];
+    var optionElements = this.el.optionsList.querySelectorAll(".option");
+    for (var i = 0; i < optionElements.length; i++) {
+      var item = optionElements[i];
+      item.classList.add("option--disabled");
+      if (this.currentOptions[i].correct) item.classList.add("option--correct");
+      else if (i === optionIndex) item.classList.add("option--wrong");
+    }
+
+    var q = this.questions[this.order[this.index]];
+    this.sessionResults.push({ id: q.id, correct: opt.correct });
+    this.el.resultBadge.textContent = opt.correct ? "Correct" : "Wrong";
+    this.el.resultBadge.className = "result-badge " + (opt.correct ? "result-badge--correct" : "result-badge--wrong");
+    this.el.resultTitle.textContent = q.title;
+    this.el.resultIllustration.textContent = q.illustration || "";
+    this.el.resultShort.textContent = q.shortExplanation;
+    this.el.resultDetailed.textContent = q.detailedExplanation;
+
+    this.el.quizSection.classList.add("hidden");
+    this.el.resultSection.classList.remove("hidden");
+    this.el.nextBtn.disabled = false;
+    this.el.nextBtn.focus();
+    this.el.nextBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  };
+
+  QuizApp.prototype.next = function () {
+    this.index++;
+    if (this.index >= this.order.length) {
+      this.showSessionSummary();
+      return;
+    }
+    this.showQuestion();
+  };
+
+  document.addEventListener("DOMContentLoaded", function () { new QuizApp(); });
+})();
+  </script>
+</body>
+</html>
