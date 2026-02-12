@@ -28,10 +28,11 @@ Edit the `QUESTIONS` array inside the `<script>` block in the HTML file. Each qu
 
 - `id` – unique string
 - `title` – question title
-- `shortExplanation` – used as the correct option and in the result
+- `shortExplanation` – used as the correct option (and in the result) when no `options` are set
 - `detailedExplanation` – shown after answering
-- `illustration` – text or emoji (e.g. 🗼)
+- `illustration` – text or code snippet (shown after answering)
 - `priority` – number
+- `options` – *(optional)* array of 4 items `{ text: string, correct: boolean }`. If present, these four options are used for the question (order is shuffled). Use for tricky questions where all four answers should be hand-picked; otherwise wrong options are chosen from other questions’ `shortExplanation`.
 
 Save the file and refresh the browser.
 

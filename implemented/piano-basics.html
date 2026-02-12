@@ -271,9 +271,12 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
     return shuffle(others).slice(0, count).map(function (q) { return q.shortExplanation; });
   }
 
-  function buildOptions(correct, all) {
-    var wrong = pickWrongOptions(all, correct, 3);
-    var options = [{ text: correct.shortExplanation, correct: true }].concat(wrong.map(function (text) { return { text: text, correct: false }; }));
+  function buildOptions(question, all) {
+    if (question.options && Array.isArray(question.options) && question.options.length === 4) {
+      return shuffle(question.options.slice());
+    }
+    var wrong = pickWrongOptions(all, question, 3);
+    var options = [{ text: question.shortExplanation, correct: true }].concat(wrong.map(function (text) { return { text: text, correct: false }; }));
     return shuffle(options);
   }
 
