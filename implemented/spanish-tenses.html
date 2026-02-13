@@ -1,243 +1,933 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#f5f5f0" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f5f5f0" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
   <title>Spanish Tenses & Ser/Estar</title>
   <style>
-/* Quiz app – simple, robust, dark/light */
-:root {
-  --bg: #f5f5f0;
-  --surface: #ffffff;
-  --text: #1a1a1a;
-  --text-muted: #555;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --correct: #15803d;
-  --wrong: #b91c1c;
-  --border: #e0e0e0;
-  --shadow: rgba(0, 0, 0, 0.08);
-  --code-bg: #e8e8e4;
-  --code-border: #ccc;
-}
-[data-theme="dark"] {
-  --bg: #1a1a1a;
-  --surface: #2d2d2d;
-  --text: #f0f0f0;
-  --text-muted: #a0a0a0;
-  --accent: #3b82f6;
-  --accent-hover: #60a5fa;
-  --correct: #22c55e;
-  --wrong: #ef4444;
-  --border: #404040;
-  --shadow: rgba(0, 0, 0, 0.3);
-  --code-bg: #252525;
-  --code-border: #444;
-}
-*,*::before,*::after{box-sizing:border-box;}
-html{font-size:100%;-webkit-text-size-adjust:100%;overflow-x:hidden;}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;overflow-x:hidden;}
-.app{max-width:42rem;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));padding-bottom:max(1rem,env(safe-area-inset-bottom));}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-top:env(safe-area-inset-top,0);flex-wrap:wrap;gap:0.5rem;}
-.title{margin:0;font-size:1.5rem;font-weight:700;}
-.header-actions{display:flex;align-items:center;gap:0.5rem;}
-.theme-toggle{width:2.75rem;height:2.75rem;min-width:2.75rem;min-height:2.75rem;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1.25rem;line-height:1;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.theme-toggle:hover{background:var(--border);}
-.main{flex:1;}
-.dashboard,.session-summary{background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:1.75rem;box-shadow:0 2px 8px var(--shadow);}
-.dashboard h2,.session-summary h2{margin:0 0 1.25rem;font-size:1.25rem;font-weight:600;}
-.dashboard p,.session-summary p{margin:0 0 0.5rem;font-size:0.9375rem;color:var(--text-muted);}
-.dashboard label{display:block;margin-bottom:0.35rem;font-size:0.875rem;font-weight:500;}
-.dashboard select{margin-bottom:1.25rem;padding:0.75rem 1rem;min-height:2.75rem;font-size:1rem;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:0.375rem;min-width:8rem;-webkit-appearance:none;appearance:none;cursor:pointer;}
-.dashboard .failed-hint{margin-bottom:1.25rem;padding:0.75rem;background:var(--code-bg);border:1px solid var(--code-border);border-radius:0.375rem;font-size:0.875rem;}
-.dashboard .failed-hint strong{color:var(--wrong);}
-.stats-chart{margin-bottom:1.5rem;}
-.dashboard .btn-primary{margin-top:1.5rem;}
-.stats-chart-bar{display:flex;height:1.75rem;border-radius:0.375rem;overflow:hidden;background:var(--border);}
-.stats-chart-segment{transition:width 0.3s ease;}
-.stats-chart-segment.segment-failed,.stats-chart-legend .dot-failed{background:var(--wrong);}
-.stats-chart-segment.segment-rest,.stats-chart-legend .dot-rest{background:var(--accent);}
-.stats-chart-segment.segment-correct,.stats-chart-legend .dot-correct{background:var(--correct);}
-.stats-chart-segment.segment-wrong,.stats-chart-legend .dot-wrong{background:var(--wrong);}
-.stats-chart-legend{display:flex;flex-wrap:wrap;gap:1rem;margin:0.5rem 0 0;font-size:0.8125rem;color:var(--text-muted);}
-.stats-chart-legend span{display:inline-flex;align-items:center;gap:0.35rem;}
-.stats-chart-legend .dot{width:0.5rem;height:0.5rem;border-radius:50%;}
-.session-summary .stats{margin:1.25rem 0;padding:1rem 1.25rem;background:var(--bg);border-radius:0.375rem;font-size:0.9375rem;}
-.session-summary #session-failed-wrap{margin-top:1.5rem;}
-.session-summary .failed-list{margin:0.5rem 0 0;padding-left:1.25rem;font-size:0.9375rem;}
-.session-summary .failed-list li{margin:0.35rem 0;}
-.session-summary .next-tip{margin-top:1.5rem;font-size:0.875rem;color:var(--text-muted);}
-.session-summary .btn-primary{margin-top:1.5rem;}
-.progress{margin:0 0 1rem;font-size:0.875rem;color:var(--text-muted);}
-.quiz-stats{font-weight:500;}
-.quiz-stats .correct-num{color:var(--correct);}
-.quiz-stats .wrong-num{color:var(--wrong);}
-.question-card{background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:1.25rem;box-shadow:0 2px 8px var(--shadow);}
-.question-title{margin:0 0 1rem;font-size:1.25rem;font-weight:600;}
-.question-illustration,.result-illustration{margin-bottom:1rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:0.8125rem;line-height:1.45;white-space:pre-wrap;word-break:break-word;text-align:left;overflow-x:auto;padding:0.875rem 1rem;background:var(--code-bg);border:1px solid var(--code-border);border-radius:0.375rem;}
-.question-illustration:empty,.result-illustration:empty{display:none;}
-.instruction{margin:0 0 0.75rem;font-size:0.875rem;color:var(--text-muted);}
-.options-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.5rem;}
-.option{display:flex;align-items:flex-start;gap:0.5rem;width:100%;min-height:2.75rem;padding:0.75rem 1rem;text-align:left;font-size:1rem;background:var(--bg);color:var(--text);border:2px solid var(--border);border-radius:0.375rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-.option-num{flex-shrink:0;font-weight:700;color:var(--text-muted);}
-.option:hover:not(.option--disabled),.option:focus-visible{border-color:var(--accent);outline:none;}
-.option--disabled{cursor:default;opacity:0.85;}
-.option--correct{border-color:var(--correct);background:rgba(21,128,61,0.12);}
-.option--wrong{border-color:var(--wrong);background:rgba(185,28,28,0.12);}
-.result-section{background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:1.25rem;margin-top:1.25rem;box-shadow:0 2px 8px var(--shadow);position:relative;}
-.result-section.hidden{display:none;}
-.result-section.result-section--correct{border-color:var(--correct);}
-.result-section.result-section--wrong{border-color:var(--wrong);}
-.result-actions{margin-top:1rem;position:relative;z-index:2;cursor:pointer;}
-.result-section .btn-primary{position:relative;z-index:2;cursor:pointer;pointer-events:auto;}
-.result-title{margin:0 0 0.75rem;font-size:1.25rem;font-weight:600;}
-.result-detail-block{margin-top:1.25rem;}
-.result-detail-block:first-child{margin-top:0;}
-.result-heading{margin:0 0 0.5rem;padding-bottom:0.35rem;border-bottom:1px solid var(--border);font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);}
-.result-example-wrap .result-heading{border-bottom:none;padding-bottom:0;}
-.result-text{margin:0;font-size:0.9375rem;}
-.result-detailed{white-space:pre-line;}
-.btn{min-height:2.75rem;padding:0.75rem 1.25rem;font-size:1rem;font-weight:500;border:none;border-radius:0.375rem;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-.btn-primary{margin-top:1rem;width:100%;background:var(--accent);color:white;}
-.btn-primary:hover,.btn-primary:focus-visible{background:var(--accent-hover);outline:none;}
-.footer{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);}
-.hint{margin:0;font-size:0.75rem;color:var(--text-muted);}
-.keyboard-tips{margin:0;font-size:0.8125rem;color:var(--text-muted);}
-.keyboard-tips strong{display:block;margin-bottom:0.25rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.03em;}
-.keyboard-tips ul{margin:0.25rem 0 0;padding-left:1.25rem;}
-.keyboard-tips li{margin:0.15rem 0;}
-kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1px solid var(--border);border-radius:0.25rem;}
-@media (max-width: 768px),(pointer: coarse){.keyboard-tips{display:none!important;}}
-@media (max-width: 480px){
-.app{padding-left:max(0.75rem,env(safe-area-inset-left));padding-right:max(0.75rem,env(safe-area-inset-right));}
-.dashboard,.session-summary{padding:1.25rem;}
-.question-card,.result-section{padding:1rem;}
-.title{font-size:1.25rem;}
-.dashboard h2,.session-summary h2{font-size:1.125rem;}
-.question-title,.result-title{font-size:1.125rem;}
-.options-list{gap:0.625rem;}
-.option{min-height:3rem;padding:0.875rem 1rem;}
-}
-@media (pointer: coarse){
-.option,.btn,.theme-toggle,.dashboard select{min-height:2.75rem;}
-.option{padding:0.875rem 1rem;}
-}
-.nav-tabs{display:flex;gap:0.5rem;margin:0;}
-.nav-tab{height:2.75rem;min-height:2.75rem;min-width:2.75rem;padding:0 0.6rem;display:inline-flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:600;border:1px solid var(--border);border-radius:0.375rem;background:var(--surface);color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.nav-tab:hover{border-color:var(--accent);}
-.nav-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
-.page{display:none;}
-.page.active{display:block;}
-.learn-intro{margin:0 0 1rem;font-size:0.9375rem;color:var(--text-muted);}
-.learn-search-row{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;margin-bottom:1rem;}
-.learn-search-row .learn-search-box{flex:1 1 12rem;min-width:0;min-height:2.5rem;padding:0.5rem 0.75rem;font-size:1rem;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:0.375rem;}
-.learn-search-row .learn-search-box::placeholder{color:var(--text-muted);}
-.learn-search-row .learn-count{font-size:0.875rem;color:var(--text-muted);white-space:nowrap;}
-.learn-search-row .learn-collapse-btn{min-height:2.5rem;padding:0.5rem 0.75rem;font-size:0.875rem;border:1px solid var(--border);border-radius:0.375rem;background:var(--surface);color:var(--text);cursor:pointer;}
-.learn-search-row .learn-collapse-btn:hover{border-color:var(--accent);}
-.learn-no-results{margin:0 0 1rem;font-size:0.9375rem;color:var(--text-muted);}
-.learn-list{list-style:none;margin:0;padding:0;}
-.learn-item{background:var(--surface);border:1px solid var(--border);border-radius:0.375rem;margin-bottom:0.5rem;box-shadow:0 1px 3px var(--shadow);overflow:hidden;}
-.learn-item.no-match{display:none;}
-.learn-btn{width:100%;text-align:left;padding:0.75rem 1rem;font-size:1rem;font-weight:600;border:none;background:none;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.learn-btn:hover{background:var(--bg);}
-.learn-btn::before{content:\"\\25B6 \";font-size:0.75em;opacity:0.7;}
-.learn-item.expanded .learn-btn::before{content:\"\\25BC \";}
-.learn-spoiler{display:none;padding:0 1rem 1rem;border-top:1px solid var(--border);}
-.learn-item.expanded .learn-spoiler{display:block;}
-.learn-spoiler p{margin:0.5rem 0 0;font-size:0.9375rem;color:var(--text);line-height:1.5;}
-.learn-spoiler p:first-child{margin-top:0;}
-.learn-spoiler .learn-detail{white-space:pre-line;}
-.learn-spoiler pre{margin:0.75rem 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:0.8125rem;line-height:1.45;white-space:pre-wrap;word-break:break-word;padding:0.875rem 1rem;background:var(--code-bg);border:1px solid var(--code-border);border-radius:0.375rem;overflow-x:auto;}
-.hidden{display:none!important;}
+    /* Quiz app – simple, robust, dark/light */
+    :root {
+      --bg: #f5f5f0;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #555;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --correct: #15803d;
+      --wrong: #b91c1c;
+      --border: #e0e0e0;
+      --shadow: rgba(0, 0, 0, 0.08);
+      --code-bg: #e8e8e4;
+      --code-border: #ccc;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1a1a1a;
+      --surface: #2d2d2d;
+      --text: #f0f0f0;
+      --text-muted: #a0a0a0;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --correct: #22c55e;
+      --wrong: #ef4444;
+      --border: #404040;
+      --shadow: rgba(0, 0, 0, 0.3);
+      --code-bg: #252525;
+      --code-border: #444;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 100%;
+      -webkit-text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 42rem;
+      margin: 0 auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      padding-left: max(1rem, env(safe-area-inset-left));
+      padding-right: max(1rem, env(safe-area-inset-right));
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-top: env(safe-area-inset-top, 0);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .theme-toggle {
+      width: 2.75rem;
+      height: 2.75rem;
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      line-height: 1;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .theme-toggle:hover {
+      background: var(--border);
+    }
+
+    .main {
+      flex: 1;
+    }
+
+    .dashboard,
+    .session-summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1.75rem;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .dashboard h2,
+    .session-summary h2 {
+      margin: 0 0 1.25rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .dashboard p,
+    .session-summary p {
+      margin: 0 0 0.5rem;
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+    }
+
+    .dashboard-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0.5rem;
+      margin: 0 0 1.25rem;
+      font-size: 0.9375rem;
+    }
+
+    .dashboard-table th {
+      text-align: left;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 0.25rem 0.75rem 0.25rem 0;
+      vertical-align: middle;
+    }
+
+    .dashboard-table td {
+      width: 6rem;
+      min-width: 6rem;
+      height: 2.75rem;
+      padding: 0.5rem 0.75rem 0.5rem 1.15rem;
+      text-align: left;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      vertical-align: middle;
+      box-sizing: border-box;
+    }
+
+    .dashboard-table td:has(select) {
+      background: var(--code-bg);
+      border-color: var(--code-border);
+      padding-right: 0.5rem;
+      padding-left: 0.75rem;
+    }
+
+    .dashboard-table select {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      padding: 0 1.5rem 0 0.4rem;
+      font-size: 0.9375rem;
+      color: var(--text);
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+      text-align: left;
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: transparent;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.35rem center;
+    }
+
+    html[data-theme="dark"] .dashboard-table td:has(select) {
+      background: #252525 !important;
+      border-color: #444;
+    }
+
+    html[data-theme="dark"] .dashboard-table select {
+      background: #252525 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0a0' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E") no-repeat right 0.35rem center !important;
+      background-size: 12px 12px;
+    }
+
+    .dashboard-table select:hover,
+    .dashboard-table select:focus {
+      outline: none;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .dashboard .stats-chart {
+      margin-bottom: 1.25rem;
+    }
+
+    .dashboard .btn-primary {
+      margin-top: 0;
+    }
+
+    .stats-chart-bar {
+      display: flex;
+      height: 1.75rem;
+      border-radius: 0.375rem;
+      overflow: hidden;
+      background: var(--border);
+    }
+
+    .stats-chart-segment {
+      transition: width 0.3s ease;
+    }
+
+    .stats-chart-segment.segment-failed,
+    .stats-chart-legend .dot-failed {
+      background: var(--wrong);
+    }
+
+    .stats-chart-segment.segment-rest,
+    .stats-chart-legend .dot-rest {
+      background: var(--accent);
+    }
+
+    .stats-chart-segment.segment-correct,
+    .stats-chart-legend .dot-correct {
+      background: var(--correct);
+    }
+
+    .stats-chart-segment.segment-wrong,
+    .stats-chart-legend .dot-wrong {
+      background: var(--wrong);
+    }
+
+    .stats-chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 0.5rem 0 0;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .stats-chart-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .stats-chart-legend .dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+    }
+
+    .session-summary .stats {
+      margin: 1.25rem 0;
+      padding: 1rem 1.25rem;
+      background: var(--bg);
+      border-radius: 0.375rem;
+      font-size: 0.9375rem;
+    }
+
+    .session-summary #session-failed-wrap {
+      margin-top: 1.5rem;
+    }
+
+    .session-summary .failed-list {
+      margin: 0.5rem 0 0;
+      padding-left: 1.25rem;
+      font-size: 0.9375rem;
+    }
+
+    .session-summary .failed-list li {
+      margin: 0.35rem 0;
+    }
+
+    .session-summary .next-tip {
+      margin-top: 1.5rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .session-summary .btn-primary {
+      margin-top: 1.5rem;
+    }
+
+    .progress {
+      margin: 0 0 1rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .quiz-stats {
+      font-weight: 500;
+    }
+
+    .quiz-stats .correct-num {
+      color: var(--correct);
+    }
+
+    .quiz-stats .wrong-num {
+      color: var(--wrong);
+    }
+
+    .question-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .question-title {
+      margin: 0 0 1rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .question-illustration,
+    .result-illustration {
+      margin-bottom: 1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+      text-align: left;
+      overflow-x: auto;
+      padding: 0.875rem 1rem;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 0.375rem;
+    }
+
+    .question-illustration:empty,
+    .result-illustration:empty {
+      display: none;
+    }
+
+    .instruction {
+      margin: 0 0 0.75rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .options-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      width: 100%;
+      min-height: 2.75rem;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: 0.375rem;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .option-num {
+      flex-shrink: 0;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .option:hover:not(.option--disabled),
+    .option:focus-visible {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .option--disabled {
+      cursor: default;
+      opacity: 0.85;
+    }
+
+    .option--correct {
+      border-color: var(--correct);
+      background: rgba(21, 128, 61, 0.12);
+    }
+
+    .option--wrong {
+      border-color: var(--wrong);
+      background: rgba(185, 28, 28, 0.12);
+    }
+
+    .result-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+      margin-top: 1.25rem;
+      box-shadow: 0 2px 8px var(--shadow);
+      position: relative;
+    }
+
+    .result-section.hidden {
+      display: none;
+    }
+
+    .result-section.result-section--correct {
+      border-color: var(--correct);
+    }
+
+    .result-section.result-section--wrong {
+      border-color: var(--wrong);
+    }
+
+    .result-actions {
+      margin-top: 1rem;
+      position: relative;
+      z-index: 2;
+      cursor: pointer;
+    }
+
+    .result-section .btn-primary {
+      position: relative;
+      z-index: 2;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .result-title {
+      margin: 0 0 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .result-detail-block {
+      margin-top: 1.25rem;
+    }
+
+    .result-detail-block:first-child {
+      margin-top: 0;
+    }
+
+    .result-heading {
+      margin: 0 0 0.5rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .result-example-wrap .result-heading {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .result-text {
+      margin: 0;
+      font-size: 0.9375rem;
+    }
+
+    .result-detailed {
+      white-space: pre-line;
+    }
+
+    .btn {
+      min-height: 2.75rem;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .btn-primary {
+      margin-top: 1rem;
+      width: 100%;
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--accent-hover);
+      outline: none;
+    }
+
+    .footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .keyboard-tips {
+      margin: 0;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .keyboard-tips strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .keyboard-tips ul {
+      margin: 0.25rem 0 0;
+      padding-left: 1.25rem;
+    }
+
+    .keyboard-tips li {
+      margin: 0.15rem 0;
+    }
+
+    kbd {
+      padding: 0.125rem 0.375rem;
+      font-size: 0.7em;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.25rem;
+    }
+
+    @media (max-width: 768px),
+    (pointer: coarse) {
+      .keyboard-tips {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app {
+        padding-left: max(0.75rem, env(safe-area-inset-left));
+        padding-right: max(0.75rem, env(safe-area-inset-right));
+      }
+
+      .dashboard,
+      .session-summary {
+        padding: 1.25rem;
+      }
+
+      .question-card,
+      .result-section {
+        padding: 1rem;
+      }
+
+      .title {
+        font-size: 1.25rem;
+      }
+
+      .dashboard h2,
+      .session-summary h2 {
+        font-size: 1.125rem;
+      }
+
+      .question-title,
+      .result-title {
+        font-size: 1.125rem;
+      }
+
+      .options-list {
+        gap: 0.625rem;
+      }
+
+      .option {
+        min-height: 3rem;
+        padding: 0.875rem 1rem;
+      }
+    }
+
+    @media (pointer: coarse) {
+
+      .option,
+      .btn,
+      .theme-toggle,
+      .dashboard select {
+        min-height: 2.75rem;
+      }
+
+      .option {
+        padding: 0.875rem 1rem;
+      }
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0;
+    }
+
+    .nav-tab {
+      height: 2.75rem;
+      min-height: 2.75rem;
+      min-width: 2.75rem;
+      padding: 0 0.6rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-tab:hover {
+      border-color: var(--accent);
+    }
+
+    .nav-tab.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .learn-intro {
+      margin: 0 0 1rem;
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+    }
+
+    .learn-search-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .learn-search-row .learn-search-box {
+      flex: 1 1 12rem;
+      min-width: 0;
+      min-height: 2.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+    }
+
+    .learn-search-row .learn-search-box::placeholder {
+      color: var(--text-muted);
+    }
+
+    .learn-search-row .learn-count {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .learn-search-row .learn-collapse-btn {
+      min-height: 2.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .learn-search-row .learn-collapse-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .learn-no-results {
+      margin: 0 0 1rem;
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+    }
+
+    .learn-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .learn-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 3px var(--shadow);
+      overflow: hidden;
+    }
+
+    .learn-item.no-match {
+      display: none;
+    }
+
+    .learn-btn {
+      width: 100%;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      background: none;
+      color: var(--text);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .learn-btn:hover {
+      background: var(--bg);
+    }
+
+    .learn-btn::before {
+      content: \"\\25B6 \";
+      font-size: 0.75em;
+      opacity: 0.7;
+    }
+
+    .learn-item.expanded .learn-btn::before {
+      content: \"\\25BC \";
+    }
+
+    .learn-spoiler {
+      display: none;
+      padding: 0 1rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .learn-item.expanded .learn-spoiler {
+      display: block;
+    }
+
+    .learn-spoiler p {
+      margin: 0.5rem 0 0;
+      font-size: 0.9375rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .learn-spoiler p:first-child {
+      margin-top: 0;
+    }
+
+    .learn-spoiler .learn-detail {
+      white-space: pre-line;
+    }
+
+    .learn-spoiler pre {
+      margin: 0.75rem 0 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding: 0.875rem 1rem;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 0.375rem;
+      overflow-x: auto;
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
+
 <body>
   <div id="app" class="app">
     <header class="header">
       <h1 class="title">Spanish Tenses & Ser/Estar</h1>
       <div class="header-actions">
         <nav class="nav-tabs" role="tablist" aria-label="Quiz or reference">
-          <button type="button" id="tab-quiz" class="nav-tab active" role="tab" aria-selected="true" aria-controls="page-quiz">Quiz</button>
-          <button type="button" id="tab-learn" class="nav-tab" role="tab" aria-selected="false" aria-controls="page-learn">Learn</button>
+          <button type="button" id="tab-quiz" class="nav-tab active" role="tab" aria-selected="true"
+            aria-controls="page-quiz">Quiz</button>
+          <button type="button" id="tab-learn" class="nav-tab" role="tab" aria-selected="false"
+            aria-controls="page-learn">Learn</button>
         </nav>
         <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark/light theme"></button>
       </div>
     </header>
     <div id="page-quiz" class="page active" role="tabpanel">
-    <main class="main">
-      <section id="dashboard-section" class="dashboard-section" aria-label="Start learning">
-        <form id="dashboard-form" class="dashboard">
-          <h2 id="dashboard-title">Start learning</h2>
-          <div id="dashboard-chart" class="stats-chart" aria-hidden="true"></div>
-          <p id="dashboard-total">Total questions in the quiz: <strong id="total-count">0</strong></p>
-          <p>Choose how many questions to answer in this try:</p>
-          <label for="question-count">Number of questions</label>
-          <select id="question-count" aria-label="Number of questions for this try"></select>
-          <div id="failed-hint" class="failed-hint hidden"></div>
-          <button type="submit" id="start-btn" class="btn btn-primary">Start</button>
-        </form>
-      </section>
-      <section id="quiz-section" class="quiz-section hidden">
-        <p class="progress" id="progress" aria-live="polite"></p>
-        <article id="question-card" class="question-card" aria-labelledby="question-title">
-          <h2 id="question-title" class="question-title"></h2>
-          <div id="question-illustration" class="question-illustration" aria-hidden="true"></div>
-          <p class="instruction" id="instruction">Select the correct short explanation (1–4 or click):</p>
-          <ul id="options-list" class="options-list" role="listbox" aria-label="Answer options"></ul>
-        </article>
-      </section>
-      <section id="result-section" class="result-section hidden" aria-live="polite">
-        <article id="result-card" class="result-card">
-          <div class="result-detail-block">
-            <h3 class="result-heading">Short explanation</h3>
-            <p id="result-short" class="result-text"></p>
+      <main class="main">
+        <section id="dashboard-section" class="dashboard-section" aria-label="Start learning">
+          <form id="dashboard-form" class="dashboard">
+            <h2 id="dashboard-title">Start learning</h2>
+            <table class="dashboard-table" aria-label="Quiz overview">
+              <tr>
+                <th scope="row">Total questions</th>
+                <td id="total-count">0</td>
+              </tr>
+              <tr>
+                <th scope="row">Session questions</th>
+                <td><label for="question-count" class="visually-hidden">Session questions</label><select
+                    id="question-count" aria-label="Number of questions for this try"></select></td>
+              </tr>
+              <tr>
+                <th scope="row">Questions to review</th>
+                <td id="review-count">0</td>
+              </tr>
+            </table>
+            <div id="dashboard-chart" class="stats-chart" aria-hidden="true"></div>
+            <button type="submit" id="start-btn" class="btn btn-primary">Start</button>
+          </form>
+        </section>
+        <section id="quiz-section" class="quiz-section hidden">
+          <p class="progress" id="progress" aria-live="polite"></p>
+          <article id="question-card" class="question-card" aria-labelledby="question-title">
+            <h2 id="question-title" class="question-title"></h2>
+            <div id="question-illustration" class="question-illustration" aria-hidden="true"></div>
+            <p class="instruction" id="instruction">Select the correct short explanation (1–4 or click):</p>
+            <ul id="options-list" class="options-list" role="listbox" aria-label="Answer options"></ul>
+          </article>
+        </section>
+        <section id="result-section" class="result-section hidden" aria-live="polite">
+          <article id="result-card" class="result-card">
+            <div class="result-detail-block">
+              <h3 class="result-heading">Short explanation</h3>
+              <p id="result-short" class="result-text"></p>
+            </div>
+            <div class="result-detail-block">
+              <h3 class="result-heading">Detailed explanation</h3>
+              <p id="result-detailed" class="result-text result-detailed"></p>
+            </div>
+            <div id="result-example-wrap" class="result-detail-block result-example-wrap hidden">
+              <h3 class="result-heading">Example</h3>
+              <div id="result-illustration" class="result-illustration" aria-hidden="true"></div>
+            </div>
+          </article>
+          <form id="result-form" class="result-actions">
+            <button type="submit" id="next-btn" class="btn btn-primary">Next question</button>
+          </form>
+        </section>
+        <section id="session-summary-section" class="session-summary-section hidden" aria-live="polite">
+          <div class="dashboard session-summary">
+            <h2>Session complete</h2>
+            <div id="session-chart" class="stats-chart" aria-hidden="true"></div>
+            <div id="session-stats" class="stats"></div>
+            <div id="session-failed-wrap" class="hidden">
+              <p><strong>Questions to review (suggested first next try):</strong></p>
+              <ul id="session-failed-list" class="failed-list"></ul>
+            </div>
+            <p class="next-tip" id="session-next-tip">Failed questions will appear first when you start your next try.
+            </p>
+            <button type="button" id="back-to-dashboard-btn" class="btn btn-primary">Back to dashboard</button>
           </div>
-          <div class="result-detail-block">
-            <h3 class="result-heading">Detailed explanation</h3>
-            <p id="result-detailed" class="result-text result-detailed"></p>
-          </div>
-          <div id="result-example-wrap" class="result-detail-block result-example-wrap hidden">
-            <h3 class="result-heading">Example</h3>
-            <div id="result-illustration" class="result-illustration" aria-hidden="true"></div>
-          </div>
-        </article>
-        <form id="result-form" class="result-actions">
-          <button type="submit" id="next-btn" class="btn btn-primary">Next question</button>
-        </form>
-      </section>
-      <section id="session-summary-section" class="session-summary-section hidden" aria-live="polite">
-        <div class="dashboard session-summary">
-          <h2>Session complete</h2>
-          <div id="session-chart" class="stats-chart" aria-hidden="true"></div>
-          <div id="session-stats" class="stats"></div>
-          <div id="session-failed-wrap" class="hidden">
-            <p><strong>Questions to review (suggested first next try):</strong></p>
-            <ul id="session-failed-list" class="failed-list"></ul>
-          </div>
-          <p class="next-tip" id="session-next-tip">Failed questions will appear first when you start your next try.</p>
-          <button type="button" id="back-to-dashboard-btn" class="btn btn-primary">Back to dashboard</button>
+        </section>
+      </main>
+      <footer class="footer">
+        <div class="keyboard-tips" aria-label="Keyboard shortcuts">
+          <strong>Keyboard shortcuts</strong>
+          <ul>
+            <li><kbd>1</kbd>–<kbd>4</kbd> — select an answer</li>
+            <li><kbd>Enter</kbd> — Start (dashboard), Next / Finish (after answering)</li>
+            <li><kbd>T</kbd> — toggle dark/light theme</li>
+          </ul>
         </div>
-      </section>
-    </main>
-    <footer class="footer">
-      <div class="keyboard-tips" aria-label="Keyboard shortcuts">
-        <strong>Keyboard shortcuts</strong>
-        <ul>
-          <li><kbd>1</kbd>–<kbd>4</kbd> — select an answer</li>
-          <li><kbd>Enter</kbd> — Start (dashboard), Next / Finish (after answering)</li>
-          <li><kbd>T</kbd> — toggle dark/light theme</li>
-        </ul>
-      </div>
-    </footer>
+      </footer>
     </div>
     <div id="page-learn" class="page learn-page" role="tabpanel" aria-labelledby="tab-learn" hidden>
       <p class="learn-intro">Reference material for the quiz. Study these topics, then try the Quiz tab.</p>
       <div class="learn-search-row">
-        <label for="learn-search-box" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Search topics</label>
-        <input type="text" id="learn-search-box" class="learn-search-box" placeholder="Search topics..." aria-label="Search topics" />
+        <label for="learn-search-box"
+          style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Search
+          topics</label>
+        <input type="text" id="learn-search-box" class="learn-search-box" placeholder="Search topics..."
+          aria-label="Search topics" />
         <span id="learn-count" class="learn-count">0</span>
         <button type="button" id="learn-collapse-btn" class="learn-collapse-btn">Collapse all</button>
         <button type="button" id="learn-expand-btn" class="learn-collapse-btn">Expand all</button>
@@ -247,456 +937,452 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
     </div>
   </div>
   <script>
-(function () {
-  var STORAGE_THEME_KEY = "quiz-theme";
-  var STORAGE_FAILED_KEY = "quiz-failed-ids-spanish-tenses";
+    (function () {
+      var STORAGE_THEME_KEY = "quiz-theme";
+      var STORAGE_FAILED_KEY = "quiz-failed-ids-spanish-tenses";
 
-  var QUESTIONS = [
-    { id: "q1", title: "¿Qué tiempo usamos para hábitos o repetición en el pasado, para descripción o fondo (ej. «jugaba», «era», «tenía 10 años»)?", shortExplanation: "Imperfecto: hábitos, fondo, descripción (ej. jugaba, era).", options: [ { text: "Hábitos, repetición o descripción en el pasado; no marca el fin de la acción.", correct: true }, { text: "Acción pasada vinculada al presente; el marco de tiempo sigue abierto.", correct: false }, { text: "Acción completada en un período ya cerrado (ayer, anoche).", correct: false }, { text: "Un tiempo para el fondo en curso; otro para el hecho que interrumpe.", correct: false } ], detailedExplanation: "El pretérito <strong>imperfecto</strong> describe acciones pasadas en curso, habituales o repetidas, y se usa para el fondo o la descripción. No se centra en el inicio o el fin de la acción.\n\nEjemplos:\n1. Cuando era niño, siempre <strong>jugaba</strong> en el parque — la infancia es un período, «jugar» era un hábito repetido → <strong>imperfecto</strong>.\n2. Mientras <strong>estudiaba</strong>, <strong>sonó</strong> el teléfono — estudiaba marca el fondo; sonó es el hecho puntual que interrumpió → <strong>imperfecto</strong> + simple.\n\nRegla: hábitos, fondo, descripción o pasado repetido («solía») → <strong>imperfecto</strong>.", illustration: "Imperfecto – usos típicos:\n\n  • Hábito / repetición:  Jugaba al fútbol.\n  • Descripción:          Era alto. Tenía ojos verdes.\n  • Fondo:                Mientras cocinaba, ...\n  • Tiempo / edad:         Cuando tenía 10 años...\n\n  -ar: -aba, -abas, -aba, -ábamos, -abais, -aban\n  -er/-ir: -ía, -ías, -ía, -íamos, -íais, -ían", priority: 1 },
-    { id: "q2", title: "¿Qué tiempo usamos cuando una acción ya hecha sigue ligada al presente porque el día, la semana o el año aún no han terminado?", shortExplanation: "Perfecto compuesto: haber + participio (ej. hoy, esta semana).", options: [ { text: "Acción pasada vinculada al presente; el marco de tiempo sigue abierto.", correct: true }, { text: "Acción completada en un período ya cerrado (ayer, anoche, el año pasado).", correct: false }, { text: "Hábitos, descripción o fondo en el pasado; no marca el fin de la acción.", correct: false }, { text: "Un tiempo para el fondo o la acción en curso; otro para el hecho puntual.", correct: false } ], detailedExplanation: "El pretérito <strong>perfecto compuesto</strong> se forma con haber en presente + participio. Une una acción pasada al presente: el período no ha terminado o el resultado sigue importando.\n\n• Ejemplo: Hoy <strong>he comido</strong> paella — «hoy» sigue siendo el día actual → <strong>compuesto</strong>.\n• Comparar: Ayer <strong>comí</strong> paella — «ayer» es un período cerrado → <strong>simple</strong>.\n• Esta semana <strong>he trabajado</strong> mucho — la semana sigue en curso → <strong>compuesto</strong>.\n\nRegla: cuando el período no ha terminado (hoy, esta semana, este año) → <strong>perfecto compuesto</strong>. Uso con: hoy, esta mañana, esta semana, este año.", illustration: "Perfecto compuesto:\n\n  haber (presente) + participio\n  he   has   ha   hemos   habéis   han\n  + -ado / -ido (regular)\n\n  Típico con: hoy, esta mañana, esta semana,\n  este año, todavía no, ya, nunca (en este período)", priority: 2 },
-    { id: "q3", title: "¿Qué tiempo usamos para una acción pasada en un período ya terminado (ayer, anoche, el año pasado, la semana pasada)?", shortExplanation: "Perfecto simple: pasado completado (ej. ayer, el año pasado).", options: [ { text: "Acción acabada en un período ya cerrado; narra lo que ocurrió.", correct: true }, { text: "Acción pasada vinculada al presente; el día o la semana no han terminado.", correct: false }, { text: "Hábitos o fondo en el pasado (solía, era, tenía).", correct: false }, { text: "Ser para identidad y hora; estar para ubicación.", correct: false } ], detailedExplanation: "El pretérito <strong>perfecto simple</strong> (indefinido) expresa acciones pasadas completadas, en un momento concreto o en un período ya terminado.\n\n• Ejemplo: Ayer <strong>llamé</strong> a mi madre — «ayer» es un día cerrado → <strong>simple</strong>.\n• El año pasado <strong>viajé</strong> a México — el año ya pasó → <strong>simple</strong>.\n\nA diferencia del imperfecto, el pasado simple no describe una acción en curso ni repetida; narra lo que ocurrió.\n\nRegla: cuando el período está terminado (ayer, anoche, el año pasado, en 2020) → <strong>perfecto simple</strong>.", illustration: "Perfecto simple (indefinido):\n\n  -ar: -é, -aste, -ó, -amos, -asteis, -aron\n  -er/-ir: -í, -iste, -ió, -imos, -isteis, -ieron\n\n  Uso con: ayer, anoche, el lunes pasado,\n  hace dos años, en 2019, la semana pasada", priority: 3 },
-    { id: "q4", title: "En «Mientras ella cocinaba, sonó el teléfono», ¿qué regla explica el uso de cada tiempo (fondo vs hecho puntual)?", shortExplanation: "Imperfecto = fondo; simple = hecho. Mientras [imperfecto], [simple].", options: [ { text: "Un tiempo marca el fondo o la acción en curso; el otro, el hecho puntual que interrumpe.", correct: true }, { text: "Solo con períodos no terminados (hoy, esta semana).", correct: false }, { text: "Solo con períodos ya cerrados (ayer, anoche).", correct: false }, { text: "Estar para estados temporales; ser para rasgos permanentes.", correct: false } ], detailedExplanation: "En la narración se combinan ambos: el <strong>imperfecto</strong> marca el escenario o la acción en curso; el <strong>simple</strong> indica lo que ocurrió (el hecho).\n\nEjemplos:\n1. Mientras ella <strong>cocinaba</strong>, yo <strong>leí</strong> el periódico — cocinar = fondo (<strong>imperfecto</strong>), leer = acción completada (<strong>simple</strong>).\n2. <strong>Estaba durmiendo</strong> cuando <strong>sonó</strong> el despertador — fondo + hecho que interrumpe.\n3. Cuando era pequeño, mi abuelo me <strong>contaba</strong> historias — ambos habituales → ambos <strong>imperfecto</strong>.\n\nRegla: fondo o acción en curso → <strong>imperfecto</strong>; hecho completado o que interrumpe → <strong>simple</strong>. Patrón: Mientras + [imperfecto], [simple].", illustration: "Combinar ambos:\n\n  Mientras [imperfecto], [simple].\n  Cuando [imperfecto], [simple].\n\n  Estaba leyendo (fondo) cuando\n  llegó (hecho) mi amigo.", priority: 4 },
-    { id: "q5", title: "¿Qué verbo usamos para identidad, origen, profesión, hora, rasgos permanentes y material?", shortExplanation: "Ser: identidad, origen, profesión, hora, rasgos permanentes.", options: [ { text: "Identidad, origen, profesión, hora y rasgos o material permanentes.", correct: true }, { text: "Ubicación, estado temporal, condición o progresivo (-ando/-iendo).", correct: false }, { text: "Mismo adjetivo: un verbo = rasgo inherente; el otro = estado actual.", correct: false }, { text: "Período no terminado: acción pasada conectada al presente.", correct: false } ], detailedExplanation: "<strong>Ser</strong> se usa para características más permanentes o definitorias:\n\n1. Identidad — <strong>Soy</strong> María.\n2. Origen — <strong>Es</strong> de Madrid.\n3. Profesión — <strong>Es</strong> médico.\n4. Hora — <strong>Es</strong> la una. La reunión <strong>es</strong> a las diez.\n5. Rasgos permanentes — <strong>Es</strong> alto.\n6. Material — La mesa <strong>es</strong> de madera.\n\n¿Por qué no estar? <strong>Estar</strong> es para ubicación, estados temporales y condiciones.\n\nRegla: identidad, origen, profesión, hora, rasgos permanentes, material → <strong>ser</strong>. Ser = ¿qué/quién es?; estar = ¿dónde? / ¿cómo (ahora)?", illustration: "SER – DOCTOR (regla mnemotécnica)\n  D Descripción (permanente)\n  O Origen\n  C Característica\n  T Tiempo\n  O Ocupación\n  R Relación\n\n  soy, eres, es, somos, sois, son\n  (más era, fue, etc. en pasado)", priority: 5 },
-    { id: "q6", title: "¿Qué verbo usamos para ubicación, estado temporal, condición o progresivo (-ando/-iendo)?", shortExplanation: "Estar: ubicación, estado temporal, condición.", options: [ { text: "Ubicación, estado temporal, condición o acción en curso (-ando/-iendo).", correct: true }, { text: "Identidad, profesión, hora y rasgos permanentes.", correct: false }, { text: "Ser = rasgo inherente; estar = estado actual (ej. listo, aburrido).", correct: false }, { text: "Acción en un período ya cerrado (perfecto simple).", correct: false } ], detailedExplanation: "<strong>Estar</strong> se usa para:\n\n1. Ubicación — <strong>Estoy</strong> en casa.\n2. Estados temporales — María <strong>está</strong> cansada hoy.\n3. Condiciones o resultados — La ventana <strong>está</strong> abierta; <strong>Está</strong> muerto.\n4. Progresivo (-ando/-iendo) — <strong>Está</strong> lloviendo.\n\n• María <strong>está</strong> cansada hoy — el cansancio es temporal → <strong>estar</strong>.\n• La sopa <strong>está</strong> deliciosa (este plato, ahora) vs <strong>es</strong> deliciosa (en general).\n\nAlgunos adjetivos cambian de significado con ser/estar: <strong>ser</strong> listo = listo (inteligente); <strong>estar</strong> listo = listo (preparado).\n\nRegla: ubicación, estado temporal, condición, resultado de un cambio, progresivo → <strong>estar</strong>. Estar = ¿dónde? ¿cómo (temporalmente)?", illustration: "ESTAR – PLACE (regla mnemotécnica)\n  P Posición\n  L Lugar\n  A Acción (-ando/-iendo)\n  C Condición\n  E Emoción\n\n  estoy, estás, está, estamos, estáis, están", priority: 6 },
-    { id: "q7", title: "Con el mismo adjetivo (ej. listo, aburrido, vivo), ¿qué diferencia hay entre ser y estar?", shortExplanation: "Ser = rasgo inherente; estar = estado actual (ej. listo: listo vs preparado).", options: [ { text: "Uno expresa rasgo inherente o permanente; el otro, estado o resultado actual.", correct: true }, { text: "Uno para identidad y hora; el otro para ubicación.", correct: false }, { text: "Acción pasada con el período aún abierto (haber + participio).", correct: false }, { text: "Imperfecto para el fondo; simple para el hecho que interrumpe.", correct: false } ], detailedExplanation: "Algunos adjetivos se usan con <strong>ser</strong> y <strong>estar</strong>; el significado cambia:\n\n• <strong>ser</strong> listo = listo (inteligente)  |  <strong>estar</strong> listo = listo (preparado)\n• <strong>ser</strong> aburrido = aburrido (pesado)  |  <strong>estar</strong> aburrido = aburrido (aburrido)\n• <strong>ser</strong> vivo = vivo (despierto)  |  <strong>estar</strong> vivo = vivo (con vida)\n• <strong>ser</strong> bueno = bueno (calidad)  |  la comida <strong>está</strong> buena = está rica ahora\n\nRegla: mismo adjetivo con <strong>ser</strong> = rasgo inherente o permanente; con <strong>estar</strong> = estado actual o resultado. En duda: ¿en general (ser) o ahora / esta situación (estar)?", illustration: "Mismo adjetivo, distinto significado:\n\n  ser listo    = listo (inteligente)\n  estar listo  = listo (preparado)\n  ser vivo     = vivo (despierto)\n  estar vivo   = vivo (con vida)\n  ser aburrido = aburrido (pesado)\n  estar aburrido = aburrido", priority: 7 },
-    { id: "q8", title: "Cuando la ambulancia llegó, el anciano ya ___ muerto en el suelo.", shortExplanation: "Estaba (estar).", options: [ { text: "Estaba (estar).", correct: true }, { text: "Era (ser).", correct: false }, { text: "Está (estar).", correct: false }, { text: "Fue (ser).", correct: false } ], detailedExplanation: "Correcto: <strong>Estaba</strong> (estar).\n\n¿Por qué <strong>estar</strong>?\n• <strong>Muerto</strong> describe una condición o resultado de un cambio (había muerto), no una identidad inherente.\n• Usamos <strong>estar</strong> para estados que alguien «entra» o «llega a ser» — muerte, matrimonio, embarazo — aunque duren mucho.\n• <strong>Estaba</strong> (imperfecto) encaja en el contexto pasado (cuando llegó la ambulancia).\n\n¿Por qué no <strong>ser</strong>?\n• <strong>Era</strong> muerto / <strong>Fue</strong> muerto trataría «muerto» como identidad, algo que no hacemos en español.\n\nRegla: Usar <strong>estar</strong> (no <strong>ser</strong>) para resultado de un cambio o condición actual — p. ej. muerto, casado, divorciado, embarazada, despierto, dormido.", illustration: "Resultado/condición → estar\n\n  estar muerto, casado, divorciado,\n  embarazada, despierto, dormido\n\n  (cambio de estado, no rasgo inherente)", priority: 8 },
-    { id: "q9", title: "Ayer ___ (llamar) a mi madre.", shortExplanation: "Llamé (perfecto simple).", options: [ { text: "Llamé (perfecto simple).", correct: true }, { text: "He llamado (perfecto compuesto).", correct: false }, { text: "Llamaba (imperfecto).", correct: false }, { text: "Llamo (presente).", correct: false } ], detailedExplanation: "Correcto: <strong>Llamé</strong> (perfecto simple).\n\n¿Por qué <strong>simple</strong>?\n• «Ayer» es un día completado — el período ya terminó.\n• La acción es un hecho único y completado.\n\nNo usamos perfecto compuesto (<strong>he llamado</strong>) con ayer — ese tiempo une el pasado al presente (ej. hoy he llamado).\n\nRegla: tiempo terminado (ayer, anoche, la semana pasada) → pasado <strong>simple</strong>.", illustration: "Ayer + [acción]\n  → perfecto simple (día terminado)\n\n  Ayer llamé / comí / salí\n  (no: ayer he llamado)", priority: 9 },
-    { id: "q10", title: "Cuando era niño, ___ (jugar) en el parque todos los días.", shortExplanation: "Jugaba (imperfecto).", options: [ { text: "Jugaba (imperfecto).", correct: true }, { text: "Jugué (perfecto simple).", correct: false }, { text: "He jugado (perfecto compuesto).", correct: false }, { text: "Estaba jugando (imperfecto progresivo).", correct: false } ], detailedExplanation: "Correcto: <strong>Jugaba</strong> (imperfecto).\n\n¿Por qué <strong>imperfecto</strong>?\n• «Todos los días» + «cuando era niño» indica hábito o acción repetida — algo que solía ocurrir.\n• Con hábitos repetidos no usamos perfecto simple (<strong>jugué</strong> = una sola vez).\n• «Estaba jugando» encaja con un momento concreto (estaba jugando cuando…), no con «todos los días».\n\nRegla: hábitos, acciones repetidas o «solía» en el pasado → <strong>imperfecto</strong> (jugaba).\n\nOtro ejemplo: Antes <strong>vivía</strong> en Madrid.", illustration: "Hábito / «solía» → imperfecto\n\n  Jugaba todos los días / Íbamos cada verano\n  Cuando era niño...\n  (repetido, no un solo hecho)", priority: 10 },
-    { id: "q11", title: "¿Qué has hecho hoy? ___ (comer) paella.", shortExplanation: "He comido (perfecto compuesto).", options: [ { text: "He comido (perfecto compuesto).", correct: true }, { text: "Comí (perfecto simple).", correct: false }, { text: "Comía (imperfecto).", correct: false }, { text: "Como (presente).", correct: false } ], detailedExplanation: "Correcto: <strong>He comido</strong> (perfecto compuesto).\n\n¿Por qué <strong>compuesto</strong>?\n• La pregunta usa «<strong>has</strong> hecho» (perfecto compuesto); la respuesta debe usar el mismo tiempo: <strong>he comido</strong>.\n• «Hoy» sigue siendo el día actual — el marco temporal no ha terminado.\n\nCon «¿Qué has hecho hoy?» no encaja <strong>comí</strong> (simple); la correlación es has hecho → he comido.\n\nRegla: hoy, esta mañana, esta semana (cuando aún estamos en ese período) → <strong>perfecto compuesto</strong>.", illustration: "¿Qué has hecho hoy? → He comido\n  (mismo tiempo: compuesto)\n\n  Hoy he comido / Esta semana he ido\n  (período no terminado)", priority: 11 },
-    { id: "q12", title: "El año pasado ___ (viajar) a México.", shortExplanation: "Viajé (perfecto simple).", options: [ { text: "Viajé (perfecto simple).", correct: true }, { text: "He viajado (perfecto compuesto).", correct: false }, { text: "Viajaba (imperfecto).", correct: false }, { text: "Viajaré (futuro).", correct: false } ], detailedExplanation: "Correcto: <strong>Viajé</strong> (perfecto simple).\n\n¿Por qué <strong>simple</strong>?\n• «El año pasado» es un período de tiempo completado.\n• La acción se ve como terminada, sin necesidad de vincularla al presente.\n\nSi dijéramos <strong>he viajado</strong> sugeriría un período que aún incluye «ahora» (ej. este año he viajado a México).\n\nRegla: períodos terminados (el año pasado, hace dos años, en 2019) → <strong>perfecto simple</strong>.", illustration: "Período terminado → perfecto simple\n\n  El año pasado viajé\n  Hace dos años compré\n  En 2019 nació mi hijo", priority: 12 },
-    { id: "q13", title: "Mientras ___ (estudiar), sonó el teléfono.", shortExplanation: "Estudiaba (imperfecto).", options: [ { text: "Estudiaba (imperfecto).", correct: true }, { text: "Estudié (perfecto simple).", correct: false }, { text: "He estudiado (perfecto compuesto).", correct: false }, { text: "Estudiaré (futuro).", correct: false } ], detailedExplanation: "Correcto: <strong>Estudiaba</strong> (imperfecto).\n\n¿Por qué?\n• <strong>Estudiaba</strong> = acción en curso (fondo) → <strong>imperfecto</strong>.\n• <strong>Sonó</strong> = hecho puntual que interrumpe → <strong>perfecto simple</strong>.\n\n(«Estaba estudiando» también sería correcto aquí; en este ejercicio se pide la forma no progresiva del imperfecto.)\n\nRegla: Mientras + [<strong>imperfecto</strong>] (fondo), [<strong>simple</strong>] (hecho). En curso o fondo → imperfecto; hecho que interrumpe o completado → simple.", illustration: "Mientras [imperfecto], [simple].\n\n  Fondo (en curso)     → imperfecto\n  Hecho que interrumpe → simple\n\n  Mientras leía, entró mi hermano.", priority: 13 },
-    { id: "q14", title: "No he tenido tiempo para nada; esta semana ___ (trabajar) mucho.", shortExplanation: "He trabajado (perfecto compuesto).", options: [ { text: "He trabajado (perfecto compuesto).", correct: true }, { text: "Trabajé (perfecto simple).", correct: false }, { text: "Trabajaba (imperfecto).", correct: false }, { text: "Trabajo (presente).", correct: false } ], detailedExplanation: "Correcto: <strong>He trabajado</strong> (perfecto compuesto).\n\n¿Por qué <strong>compuesto</strong>?\n• «Esta semana» suele incluir hoy y aún no ha terminado.\n• La acción es pasada pero el marco temporal sigue vigente.\n\nSi la semana hubiera terminado diríamos La semana pasada <strong>trabajé</strong> mucho (<strong>simple</strong>).\n\nRegla: cuando el período sigue en curso (esta semana, este mes, este año) → <strong>perfecto compuesto</strong>.", illustration: "Esta semana / Este mes (en curso)\n  → perfecto compuesto\n\n  Esta semana he trabajado\n  Este año hemos viajado tres veces", priority: 14 },
-    { id: "q15", title: "La reunión ___ a las diez. (Indica la hora.)", shortExplanation: "Es (ser).", options: [ { text: "Es (ser).", correct: true }, { text: "Está (estar).", correct: false }, { text: "Son (ser).", correct: false }, { text: "Están (estar).", correct: false } ], detailedExplanation: "Correcto: <strong>Es</strong> (ser).\n\n¿Por qué <strong>ser</strong>?\n• Estamos indicando la hora o cuándo está programado algo.\n• La hora y las fechas usan <strong>ser</strong>: <strong>Es</strong> la una, <strong>Son</strong> las diez, La cita <strong>es</strong> el lunes.\n\nLa pregunta «¿A qué hora es...?» marca el contexto (hora). No usamos estar para la hora.\n\nRegla: hora y horario → <strong>ser</strong>. Estar = ubicación o estado temporal (La reunión está en la sala 3; Estoy listo).", illustration: "Hora / horario → SER\n\n  Es la una.  Son las diez.\n  La reunión es a las diez.\n  La clase es el lunes.", priority: 15 },
-    { id: "q16", title: "María no ha dormido bien. ___ cansada hoy.", shortExplanation: "Está (estar).", options: [ { text: "Está (estar).", correct: true }, { text: "Es (ser).", correct: false }, { text: "Estaban (estar).", correct: false }, { text: "Estará (estar, futuro).", correct: false } ], detailedExplanation: "Correcto: <strong>Está</strong> (estar).\n\n¿Por qué <strong>estar</strong>?\n• La primera oración (no ha dormido bien) da contexto: está cansada en este momento.\n• Estado físico o emocional temporal → <strong>estar</strong>.\n\nComparar:\n• María <strong>es</strong> simpática (rasgo) → <strong>ser</strong>.\n• María <strong>está</strong> contenta hoy (estado) → <strong>estar</strong>.\n\nRegla: estado o condición temporal → <strong>estar</strong>; característica permanente → <strong>ser</strong>.", illustration: "Estado temporal → ESTAR\n\n  Está cansada / enferma / contenta\n  (cómo está ahora, puede cambiar)", priority: 16 },
-    { id: "q17", title: "No trabaja en una oficina; trabaja en el hospital. Él ___ médico.", shortExplanation: "Es (ser).", options: [ { text: "Es (ser).", correct: true }, { text: "Está (estar).", correct: false }, { text: "Era (ser).", correct: false }, { text: "Está siendo (estar + gerundio).", correct: false } ], detailedExplanation: "Correcto: <strong>Es</strong> (ser).\n\n¿Por qué <strong>ser</strong>?\n• El contexto (trabaja en el hospital) indica que estamos indicando su profesión.\n• La profesión es parte de la identidad → <strong>ser</strong>.\n\nNo usamos <strong>estar</strong> para profesiones. Estar sería para dónde está o cómo está en el momento (<strong>Está</strong> en el hospital; <strong>Está</strong> ocupado).\n\nRegla: profesión y ocupación → <strong>ser</strong> (identidad).", illustration: "Profesión → SER\n\n  Soy profesor.  Es médico.\n  (identidad / ocupación)", priority: 17 },
-    { id: "q18", title: "Acabo de probar la sopa. La sopa ___ deliciosa.", shortExplanation: "Está (estar).", options: [ { text: "Está (estar).", correct: true }, { text: "Es (ser).", correct: false }, { text: "Estaba (estar).", correct: false }, { text: "Estará (estar).", correct: false } ], detailedExplanation: "Correcto: <strong>Está</strong> (estar).\n\n¿Por qué <strong>estar</strong>?\n• La primera oración (Acabo de probar la sopa) da contexto: este plato, ahora — tu experiencia en este momento.\n• Este momento concreto → <strong>estar</strong>.\n\nSi el contexto fuera general (ej. Es la especialidad de la casa. La sopa ___ deliciosa), usaríamos <strong>es</strong> (<strong>ser</strong>): la sopa como característica del plato.\n\nRegla: este momento / este plato → <strong>estar</strong>; cualidad en general → <strong>ser</strong>.", illustration: "El contexto decide ser vs estar (sabor):\n\n  Acabo de probarla  → está (este momento)\n  Es la especialidad  → es (en general)", priority: 18 },
-    { id: "q19", title: "Es la especialidad de la casa. La sopa ___ deliciosa.", shortExplanation: "Es (ser).", options: [ { text: "Es (ser).", correct: true }, { text: "Está (estar).", correct: false }, { text: "Era (ser).", correct: false }, { text: "Estaba (estar).", correct: false } ], detailedExplanation: "Correcto: <strong>Es</strong> (ser).\n\n¿Por qué <strong>ser</strong>?\n• La primera oración (Es la especialidad de la casa) da contexto: la sopa como cualidad general del restaurante — característicamente deliciosa.\n• Cualidad en general → <strong>ser</strong>.\n\nSi el contexto fuera este momento (ej. Acabo de probar la sopa. La sopa ___ deliciosa), usaríamos <strong>está</strong> (<strong>estar</strong>).\n\nRegla: cualidad o característica general del plato → <strong>ser</strong>; este momento / este plato → <strong>estar</strong>.", illustration: "El contexto decide ser vs estar (sabor):\n\n  Es la especialidad  → es (en general)\n  Acabo de probarla  → está (este momento)", priority: 19 }
-  ];
+      var QUESTIONS = [
+        { id: "q1", title: "¿Qué tiempo usamos para hábitos o repetición en el pasado, para descripción o fondo (ej. «jugaba», «era», «tenía 10 años»)?", shortExplanation: "Imperfecto: hábitos, fondo, descripción (ej. jugaba, era).", options: [{ text: "Hábitos, repetición o descripción en el pasado; no marca el fin de la acción.", correct: true }, { text: "Acción pasada vinculada al presente; el marco de tiempo sigue abierto.", correct: false }, { text: "Acción completada en un período ya cerrado (ayer, anoche).", correct: false }, { text: "Un tiempo para el fondo en curso; otro para el hecho que interrumpe.", correct: false }], detailedExplanation: "El pretérito <strong>imperfecto</strong> describe acciones pasadas en curso, habituales o repetidas, y se usa para el fondo o la descripción. No se centra en el inicio o el fin de la acción.\n\nEjemplos:\n1. Cuando era niño, siempre <strong>jugaba</strong> en el parque — la infancia es un período, «jugar» era un hábito repetido → <strong>imperfecto</strong>.\n2. Mientras <strong>estudiaba</strong>, <strong>sonó</strong> el teléfono — estudiaba marca el fondo; sonó es el hecho puntual que interrumpió → <strong>imperfecto</strong> + simple.\n\nRegla: hábitos, fondo, descripción o pasado repetido («solía») → <strong>imperfecto</strong>.", illustration: "Imperfecto – usos típicos:\n\n  • Hábito / repetición:  Jugaba al fútbol.\n  • Descripción:          Era alto. Tenía ojos verdes.\n  • Fondo:                Mientras cocinaba, ...\n  • Tiempo / edad:         Cuando tenía 10 años...\n\n  -ar: -aba, -abas, -aba, -ábamos, -abais, -aban\n  -er/-ir: -ía, -ías, -ía, -íamos, -íais, -ían", priority: 1 },
+        { id: "q2", title: "¿Qué tiempo usamos cuando una acción ya hecha sigue ligada al presente porque el día, la semana o el año aún no han terminado?", shortExplanation: "Perfecto compuesto: haber + participio (ej. hoy, esta semana).", options: [{ text: "Acción pasada vinculada al presente; el marco de tiempo sigue abierto.", correct: true }, { text: "Acción completada en un período ya cerrado (ayer, anoche, el año pasado).", correct: false }, { text: "Hábitos, descripción o fondo en el pasado; no marca el fin de la acción.", correct: false }, { text: "Un tiempo para el fondo o la acción en curso; otro para el hecho puntual.", correct: false }], detailedExplanation: "El pretérito <strong>perfecto compuesto</strong> se forma con haber en presente + participio. Une una acción pasada al presente: el período no ha terminado o el resultado sigue importando.\n\n• Ejemplo: Hoy <strong>he comido</strong> paella — «hoy» sigue siendo el día actual → <strong>compuesto</strong>.\n• Comparar: Ayer <strong>comí</strong> paella — «ayer» es un período cerrado → <strong>simple</strong>.\n• Esta semana <strong>he trabajado</strong> mucho — la semana sigue en curso → <strong>compuesto</strong>.\n\nRegla: cuando el período no ha terminado (hoy, esta semana, este año) → <strong>perfecto compuesto</strong>. Uso con: hoy, esta mañana, esta semana, este año.", illustration: "Perfecto compuesto:\n\n  haber (presente) + participio\n  he   has   ha   hemos   habéis   han\n  + -ado / -ido (regular)\n\n  Típico con: hoy, esta mañana, esta semana,\n  este año, todavía no, ya, nunca (en este período)", priority: 2 },
+        { id: "q3", title: "¿Qué tiempo usamos para una acción pasada en un período ya terminado (ayer, anoche, el año pasado, la semana pasada)?", shortExplanation: "Perfecto simple: pasado completado (ej. ayer, el año pasado).", options: [{ text: "Acción acabada en un período ya cerrado; narra lo que ocurrió.", correct: true }, { text: "Acción pasada vinculada al presente; el día o la semana no han terminado.", correct: false }, { text: "Hábitos o fondo en el pasado (solía, era, tenía).", correct: false }, { text: "Ser para identidad y hora; estar para ubicación.", correct: false }], detailedExplanation: "El pretérito <strong>perfecto simple</strong> (indefinido) expresa acciones pasadas completadas, en un momento concreto o en un período ya terminado.\n\n• Ejemplo: Ayer <strong>llamé</strong> a mi madre — «ayer» es un día cerrado → <strong>simple</strong>.\n• El año pasado <strong>viajé</strong> a México — el año ya pasó → <strong>simple</strong>.\n\nA diferencia del imperfecto, el pasado simple no describe una acción en curso ni repetida; narra lo que ocurrió.\n\nRegla: cuando el período está terminado (ayer, anoche, el año pasado, en 2020) → <strong>perfecto simple</strong>.", illustration: "Perfecto simple (indefinido):\n\n  -ar: -é, -aste, -ó, -amos, -asteis, -aron\n  -er/-ir: -í, -iste, -ió, -imos, -isteis, -ieron\n\n  Uso con: ayer, anoche, el lunes pasado,\n  hace dos años, en 2019, la semana pasada", priority: 3 },
+        { id: "q4", title: "En «Mientras ella cocinaba, sonó el teléfono», ¿qué regla explica el uso de cada tiempo (fondo vs hecho puntual)?", shortExplanation: "Imperfecto = fondo; simple = hecho. Mientras [imperfecto], [simple].", options: [{ text: "Un tiempo marca el fondo o la acción en curso; el otro, el hecho puntual que interrumpe.", correct: true }, { text: "Solo con períodos no terminados (hoy, esta semana).", correct: false }, { text: "Solo con períodos ya cerrados (ayer, anoche).", correct: false }, { text: "Estar para estados temporales; ser para rasgos permanentes.", correct: false }], detailedExplanation: "En la narración se combinan ambos: el <strong>imperfecto</strong> marca el escenario o la acción en curso; el <strong>simple</strong> indica lo que ocurrió (el hecho).\n\nEjemplos:\n1. Mientras ella <strong>cocinaba</strong>, yo <strong>leí</strong> el periódico — cocinar = fondo (<strong>imperfecto</strong>), leer = acción completada (<strong>simple</strong>).\n2. <strong>Estaba durmiendo</strong> cuando <strong>sonó</strong> el despertador — fondo + hecho que interrumpe.\n3. Cuando era pequeño, mi abuelo me <strong>contaba</strong> historias — ambos habituales → ambos <strong>imperfecto</strong>.\n\nRegla: fondo o acción en curso → <strong>imperfecto</strong>; hecho completado o que interrumpe → <strong>simple</strong>. Patrón: Mientras + [imperfecto], [simple].", illustration: "Combinar ambos:\n\n  Mientras [imperfecto], [simple].\n  Cuando [imperfecto], [simple].\n\n  Estaba leyendo (fondo) cuando\n  llegó (hecho) mi amigo.", priority: 4 },
+        { id: "q5", title: "¿Qué verbo usamos para identidad, origen, profesión, hora, rasgos permanentes y material?", shortExplanation: "Ser: identidad, origen, profesión, hora, rasgos permanentes.", options: [{ text: "Identidad, origen, profesión, hora y rasgos o material permanentes.", correct: true }, { text: "Ubicación, estado temporal, condición o progresivo (-ando/-iendo).", correct: false }, { text: "Mismo adjetivo: un verbo = rasgo inherente; el otro = estado actual.", correct: false }, { text: "Período no terminado: acción pasada conectada al presente.", correct: false }], detailedExplanation: "<strong>Ser</strong> se usa para características más permanentes o definitorias:\n\n1. Identidad — <strong>Soy</strong> María.\n2. Origen — <strong>Es</strong> de Madrid.\n3. Profesión — <strong>Es</strong> médico.\n4. Hora — <strong>Es</strong> la una. La reunión <strong>es</strong> a las diez.\n5. Rasgos permanentes — <strong>Es</strong> alto.\n6. Material — La mesa <strong>es</strong> de madera.\n\n¿Por qué no estar? <strong>Estar</strong> es para ubicación, estados temporales y condiciones.\n\nRegla: identidad, origen, profesión, hora, rasgos permanentes, material → <strong>ser</strong>. Ser = ¿qué/quién es?; estar = ¿dónde? / ¿cómo (ahora)?", illustration: "SER – DOCTOR (regla mnemotécnica)\n  D Descripción (permanente)\n  O Origen\n  C Característica\n  T Tiempo\n  O Ocupación\n  R Relación\n\n  soy, eres, es, somos, sois, son\n  (más era, fue, etc. en pasado)", priority: 5 },
+        { id: "q6", title: "¿Qué verbo usamos para ubicación, estado temporal, condición o progresivo (-ando/-iendo)?", shortExplanation: "Estar: ubicación, estado temporal, condición.", options: [{ text: "Ubicación, estado temporal, condición o acción en curso (-ando/-iendo).", correct: true }, { text: "Identidad, profesión, hora y rasgos permanentes.", correct: false }, { text: "Ser = rasgo inherente; estar = estado actual (ej. listo, aburrido).", correct: false }, { text: "Acción en un período ya cerrado (perfecto simple).", correct: false }], detailedExplanation: "<strong>Estar</strong> se usa para:\n\n1. Ubicación — <strong>Estoy</strong> en casa.\n2. Estados temporales — María <strong>está</strong> cansada hoy.\n3. Condiciones o resultados — La ventana <strong>está</strong> abierta; <strong>Está</strong> muerto.\n4. Progresivo (-ando/-iendo) — <strong>Está</strong> lloviendo.\n\n• María <strong>está</strong> cansada hoy — el cansancio es temporal → <strong>estar</strong>.\n• La sopa <strong>está</strong> deliciosa (este plato, ahora) vs <strong>es</strong> deliciosa (en general).\n\nAlgunos adjetivos cambian de significado con ser/estar: <strong>ser</strong> listo = listo (inteligente); <strong>estar</strong> listo = listo (preparado).\n\nRegla: ubicación, estado temporal, condición, resultado de un cambio, progresivo → <strong>estar</strong>. Estar = ¿dónde? ¿cómo (temporalmente)?", illustration: "ESTAR – PLACE (regla mnemotécnica)\n  P Posición\n  L Lugar\n  A Acción (-ando/-iendo)\n  C Condición\n  E Emoción\n\n  estoy, estás, está, estamos, estáis, están", priority: 6 },
+        { id: "q7", title: "Con el mismo adjetivo (ej. listo, aburrido, vivo), ¿qué diferencia hay entre ser y estar?", shortExplanation: "Ser = rasgo inherente; estar = estado actual (ej. listo: listo vs preparado).", options: [{ text: "Uno expresa rasgo inherente o permanente; el otro, estado o resultado actual.", correct: true }, { text: "Uno para identidad y hora; el otro para ubicación.", correct: false }, { text: "Acción pasada con el período aún abierto (haber + participio).", correct: false }, { text: "Imperfecto para el fondo; simple para el hecho que interrumpe.", correct: false }], detailedExplanation: "Algunos adjetivos se usan con <strong>ser</strong> y <strong>estar</strong>; el significado cambia:\n\n• <strong>ser</strong> listo = listo (inteligente)  |  <strong>estar</strong> listo = listo (preparado)\n• <strong>ser</strong> aburrido = aburrido (pesado)  |  <strong>estar</strong> aburrido = aburrido (aburrido)\n• <strong>ser</strong> vivo = vivo (despierto)  |  <strong>estar</strong> vivo = vivo (con vida)\n• <strong>ser</strong> bueno = bueno (calidad)  |  la comida <strong>está</strong> buena = está rica ahora\n\nRegla: mismo adjetivo con <strong>ser</strong> = rasgo inherente o permanente; con <strong>estar</strong> = estado actual o resultado. En duda: ¿en general (ser) o ahora / esta situación (estar)?", illustration: "Mismo adjetivo, distinto significado:\n\n  ser listo    = listo (inteligente)\n  estar listo  = listo (preparado)\n  ser vivo     = vivo (despierto)\n  estar vivo   = vivo (con vida)\n  ser aburrido = aburrido (pesado)\n  estar aburrido = aburrido", priority: 7 },
+        { id: "q8", title: "Cuando la ambulancia llegó, el anciano ya ___ muerto en el suelo.", shortExplanation: "Estaba (estar).", options: [{ text: "Estaba (estar).", correct: true }, { text: "Era (ser).", correct: false }, { text: "Está (estar).", correct: false }, { text: "Fue (ser).", correct: false }], detailedExplanation: "Correcto: <strong>Estaba</strong> (estar).\n\n¿Por qué <strong>estar</strong>?\n• <strong>Muerto</strong> describe una condición o resultado de un cambio (había muerto), no una identidad inherente.\n• Usamos <strong>estar</strong> para estados que alguien «entra» o «llega a ser» — muerte, matrimonio, embarazo — aunque duren mucho.\n• <strong>Estaba</strong> (imperfecto) encaja en el contexto pasado (cuando llegó la ambulancia).\n\n¿Por qué no <strong>ser</strong>?\n• <strong>Era</strong> muerto / <strong>Fue</strong> muerto trataría «muerto» como identidad, algo que no hacemos en español.\n\nRegla: Usar <strong>estar</strong> (no <strong>ser</strong>) para resultado de un cambio o condición actual — p. ej. muerto, casado, divorciado, embarazada, despierto, dormido.", illustration: "Resultado/condición → estar\n\n  estar muerto, casado, divorciado,\n  embarazada, despierto, dormido\n\n  (cambio de estado, no rasgo inherente)", priority: 8 },
+        { id: "q9", title: "Ayer ___ (llamar) a mi madre.", shortExplanation: "Llamé (perfecto simple).", options: [{ text: "Llamé (perfecto simple).", correct: true }, { text: "He llamado (perfecto compuesto).", correct: false }, { text: "Llamaba (imperfecto).", correct: false }, { text: "Llamo (presente).", correct: false }], detailedExplanation: "Correcto: <strong>Llamé</strong> (perfecto simple).\n\n¿Por qué <strong>simple</strong>?\n• «Ayer» es un día completado — el período ya terminó.\n• La acción es un hecho único y completado.\n\nNo usamos perfecto compuesto (<strong>he llamado</strong>) con ayer — ese tiempo une el pasado al presente (ej. hoy he llamado).\n\nRegla: tiempo terminado (ayer, anoche, la semana pasada) → pasado <strong>simple</strong>.", illustration: "Ayer + [acción]\n  → perfecto simple (día terminado)\n\n  Ayer llamé / comí / salí\n  (no: ayer he llamado)", priority: 9 },
+        { id: "q10", title: "Cuando era niño, ___ (jugar) en el parque todos los días.", shortExplanation: "Jugaba (imperfecto).", options: [{ text: "Jugaba (imperfecto).", correct: true }, { text: "Jugué (perfecto simple).", correct: false }, { text: "He jugado (perfecto compuesto).", correct: false }, { text: "Estaba jugando (imperfecto progresivo).", correct: false }], detailedExplanation: "Correcto: <strong>Jugaba</strong> (imperfecto).\n\n¿Por qué <strong>imperfecto</strong>?\n• «Todos los días» + «cuando era niño» indica hábito o acción repetida — algo que solía ocurrir.\n• Con hábitos repetidos no usamos perfecto simple (<strong>jugué</strong> = una sola vez).\n• «Estaba jugando» encaja con un momento concreto (estaba jugando cuando…), no con «todos los días».\n\nRegla: hábitos, acciones repetidas o «solía» en el pasado → <strong>imperfecto</strong> (jugaba).\n\nOtro ejemplo: Antes <strong>vivía</strong> en Madrid.", illustration: "Hábito / «solía» → imperfecto\n\n  Jugaba todos los días / Íbamos cada verano\n  Cuando era niño...\n  (repetido, no un solo hecho)", priority: 10 },
+        { id: "q11", title: "¿Qué has hecho hoy? ___ (comer) paella.", shortExplanation: "He comido (perfecto compuesto).", options: [{ text: "He comido (perfecto compuesto).", correct: true }, { text: "Comí (perfecto simple).", correct: false }, { text: "Comía (imperfecto).", correct: false }, { text: "Como (presente).", correct: false }], detailedExplanation: "Correcto: <strong>He comido</strong> (perfecto compuesto).\n\n¿Por qué <strong>compuesto</strong>?\n• La pregunta usa «<strong>has</strong> hecho» (perfecto compuesto); la respuesta debe usar el mismo tiempo: <strong>he comido</strong>.\n• «Hoy» sigue siendo el día actual — el marco temporal no ha terminado.\n\nCon «¿Qué has hecho hoy?» no encaja <strong>comí</strong> (simple); la correlación es has hecho → he comido.\n\nRegla: hoy, esta mañana, esta semana (cuando aún estamos en ese período) → <strong>perfecto compuesto</strong>.", illustration: "¿Qué has hecho hoy? → He comido\n  (mismo tiempo: compuesto)\n\n  Hoy he comido / Esta semana he ido\n  (período no terminado)", priority: 11 },
+        { id: "q12", title: "El año pasado ___ (viajar) a México.", shortExplanation: "Viajé (perfecto simple).", options: [{ text: "Viajé (perfecto simple).", correct: true }, { text: "He viajado (perfecto compuesto).", correct: false }, { text: "Viajaba (imperfecto).", correct: false }, { text: "Viajaré (futuro).", correct: false }], detailedExplanation: "Correcto: <strong>Viajé</strong> (perfecto simple).\n\n¿Por qué <strong>simple</strong>?\n• «El año pasado» es un período de tiempo completado.\n• La acción se ve como terminada, sin necesidad de vincularla al presente.\n\nSi dijéramos <strong>he viajado</strong> sugeriría un período que aún incluye «ahora» (ej. este año he viajado a México).\n\nRegla: períodos terminados (el año pasado, hace dos años, en 2019) → <strong>perfecto simple</strong>.", illustration: "Período terminado → perfecto simple\n\n  El año pasado viajé\n  Hace dos años compré\n  En 2019 nació mi hijo", priority: 12 },
+        { id: "q13", title: "Mientras ___ (estudiar), sonó el teléfono.", shortExplanation: "Estudiaba (imperfecto).", options: [{ text: "Estudiaba (imperfecto).", correct: true }, { text: "Estudié (perfecto simple).", correct: false }, { text: "He estudiado (perfecto compuesto).", correct: false }, { text: "Estudiaré (futuro).", correct: false }], detailedExplanation: "Correcto: <strong>Estudiaba</strong> (imperfecto).\n\n¿Por qué?\n• <strong>Estudiaba</strong> = acción en curso (fondo) → <strong>imperfecto</strong>.\n• <strong>Sonó</strong> = hecho puntual que interrumpe → <strong>perfecto simple</strong>.\n\n(«Estaba estudiando» también sería correcto aquí; en este ejercicio se pide la forma no progresiva del imperfecto.)\n\nRegla: Mientras + [<strong>imperfecto</strong>] (fondo), [<strong>simple</strong>] (hecho). En curso o fondo → imperfecto; hecho que interrumpe o completado → simple.", illustration: "Mientras [imperfecto], [simple].\n\n  Fondo (en curso)     → imperfecto\n  Hecho que interrumpe → simple\n\n  Mientras leía, entró mi hermano.", priority: 13 },
+        { id: "q14", title: "No he tenido tiempo para nada; esta semana ___ (trabajar) mucho.", shortExplanation: "He trabajado (perfecto compuesto).", options: [{ text: "He trabajado (perfecto compuesto).", correct: true }, { text: "Trabajé (perfecto simple).", correct: false }, { text: "Trabajaba (imperfecto).", correct: false }, { text: "Trabajo (presente).", correct: false }], detailedExplanation: "Correcto: <strong>He trabajado</strong> (perfecto compuesto).\n\n¿Por qué <strong>compuesto</strong>?\n• «Esta semana» suele incluir hoy y aún no ha terminado.\n• La acción es pasada pero el marco temporal sigue vigente.\n\nSi la semana hubiera terminado diríamos La semana pasada <strong>trabajé</strong> mucho (<strong>simple</strong>).\n\nRegla: cuando el período sigue en curso (esta semana, este mes, este año) → <strong>perfecto compuesto</strong>.", illustration: "Esta semana / Este mes (en curso)\n  → perfecto compuesto\n\n  Esta semana he trabajado\n  Este año hemos viajado tres veces", priority: 14 },
+        { id: "q15", title: "La reunión ___ a las diez. (Indica la hora.)", shortExplanation: "Es (ser).", options: [{ text: "Es (ser).", correct: true }, { text: "Está (estar).", correct: false }, { text: "Son (ser).", correct: false }, { text: "Están (estar).", correct: false }], detailedExplanation: "Correcto: <strong>Es</strong> (ser).\n\n¿Por qué <strong>ser</strong>?\n• Estamos indicando la hora o cuándo está programado algo.\n• La hora y las fechas usan <strong>ser</strong>: <strong>Es</strong> la una, <strong>Son</strong> las diez, La cita <strong>es</strong> el lunes.\n\nLa pregunta «¿A qué hora es...?» marca el contexto (hora). No usamos estar para la hora.\n\nRegla: hora y horario → <strong>ser</strong>. Estar = ubicación o estado temporal (La reunión está en la sala 3; Estoy listo).", illustration: "Hora / horario → SER\n\n  Es la una.  Son las diez.\n  La reunión es a las diez.\n  La clase es el lunes.", priority: 15 },
+        { id: "q16", title: "María no ha dormido bien. ___ cansada hoy.", shortExplanation: "Está (estar).", options: [{ text: "Está (estar).", correct: true }, { text: "Es (ser).", correct: false }, { text: "Estaban (estar).", correct: false }, { text: "Estará (estar, futuro).", correct: false }], detailedExplanation: "Correcto: <strong>Está</strong> (estar).\n\n¿Por qué <strong>estar</strong>?\n• La primera oración (no ha dormido bien) da contexto: está cansada en este momento.\n• Estado físico o emocional temporal → <strong>estar</strong>.\n\nComparar:\n• María <strong>es</strong> simpática (rasgo) → <strong>ser</strong>.\n• María <strong>está</strong> contenta hoy (estado) → <strong>estar</strong>.\n\nRegla: estado o condición temporal → <strong>estar</strong>; característica permanente → <strong>ser</strong>.", illustration: "Estado temporal → ESTAR\n\n  Está cansada / enferma / contenta\n  (cómo está ahora, puede cambiar)", priority: 16 },
+        { id: "q17", title: "No trabaja en una oficina; trabaja en el hospital. Él ___ médico.", shortExplanation: "Es (ser).", options: [{ text: "Es (ser).", correct: true }, { text: "Está (estar).", correct: false }, { text: "Era (ser).", correct: false }, { text: "Está siendo (estar + gerundio).", correct: false }], detailedExplanation: "Correcto: <strong>Es</strong> (ser).\n\n¿Por qué <strong>ser</strong>?\n• El contexto (trabaja en el hospital) indica que estamos indicando su profesión.\n• La profesión es parte de la identidad → <strong>ser</strong>.\n\nNo usamos <strong>estar</strong> para profesiones. Estar sería para dónde está o cómo está en el momento (<strong>Está</strong> en el hospital; <strong>Está</strong> ocupado).\n\nRegla: profesión y ocupación → <strong>ser</strong> (identidad).", illustration: "Profesión → SER\n\n  Soy profesor.  Es médico.\n  (identidad / ocupación)", priority: 17 },
+        { id: "q18", title: "Acabo de probar la sopa. La sopa ___ deliciosa.", shortExplanation: "Está (estar).", options: [{ text: "Está (estar).", correct: true }, { text: "Es (ser).", correct: false }, { text: "Estaba (estar).", correct: false }, { text: "Estará (estar).", correct: false }], detailedExplanation: "Correcto: <strong>Está</strong> (estar).\n\n¿Por qué <strong>estar</strong>?\n• La primera oración (Acabo de probar la sopa) da contexto: este plato, ahora — tu experiencia en este momento.\n• Este momento concreto → <strong>estar</strong>.\n\nSi el contexto fuera general (ej. Es la especialidad de la casa. La sopa ___ deliciosa), usaríamos <strong>es</strong> (<strong>ser</strong>): la sopa como característica del plato.\n\nRegla: este momento / este plato → <strong>estar</strong>; cualidad en general → <strong>ser</strong>.", illustration: "El contexto decide ser vs estar (sabor):\n\n  Acabo de probarla  → está (este momento)\n  Es la especialidad  → es (en general)", priority: 18 },
+        { id: "q19", title: "Es la especialidad de la casa. La sopa ___ deliciosa.", shortExplanation: "Es (ser).", options: [{ text: "Es (ser).", correct: true }, { text: "Está (estar).", correct: false }, { text: "Era (ser).", correct: false }, { text: "Estaba (estar).", correct: false }], detailedExplanation: "Correcto: <strong>Es</strong> (ser).\n\n¿Por qué <strong>ser</strong>?\n• La primera oración (Es la especialidad de la casa) da contexto: la sopa como cualidad general del restaurante — característicamente deliciosa.\n• Cualidad en general → <strong>ser</strong>.\n\nSi el contexto fuera este momento (ej. Acabo de probar la sopa. La sopa ___ deliciosa), usaríamos <strong>está</strong> (<strong>estar</strong>).\n\nRegla: cualidad o característica general del plato → <strong>ser</strong>; este momento / este plato → <strong>estar</strong>.", illustration: "El contexto decide ser vs estar (sabor):\n\n  Es la especialidad  → es (en general)\n  Acabo de probarla  → está (este momento)", priority: 19 }
+      ];
 
-  function escapeHtml(text) {
-    var div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  function shuffle(array) {
-    var out = array.slice();
-    for (var i = out.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = out[i]; out[i] = out[j]; out[j] = t;
-    }
-    return out;
-  }
-
-  function pickWrongOptions(questions, correctQuestion, count) {
-    var others = questions.filter(function (q) { return q.id !== correctQuestion.id; });
-    return shuffle(others).slice(0, count).map(function (q) { return q.shortExplanation; });
-  }
-
-  function buildOptions(question, all) {
-    if (question.options && Array.isArray(question.options) && question.options.length === 4) {
-      return shuffle(question.options.slice());
-    }
-    var wrong = pickWrongOptions(all, question, 3);
-    var options = [{ text: question.shortExplanation, correct: true }].concat(wrong.map(function (text) { return { text: text, correct: false }; }));
-    return shuffle(options);
-  }
-
-  function parseFailedIds() {
-    try {
-      var raw = localStorage.getItem(STORAGE_FAILED_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) { return []; }
-  }
-
-  function buildOrder(questions, count, failedIds) {
-    var total = questions.length;
-    var failedIndices = [];
-    var otherIndices = [];
-    for (var i = 0; i < total; i++) {
-      if (failedIds.indexOf(questions[i].id) !== -1) failedIndices.push(i);
-      else otherIndices.push(i);
-    }
-    return shuffle(failedIndices).concat(shuffle(otherIndices)).slice(0, count);
-  }
-
-  function QuizApp() {
-    var self = this;
-    this.questions = QUESTIONS.slice();
-    this.order = [];
-    this.selectedCount = 0;
-    this.index = 0;
-    this.currentOptions = [];
-    this.answered = false;
-    this.sessionResults = [];
-
-    this.el = {
-      dashboardSection: document.getElementById("dashboard-section"),
-      totalCount: document.getElementById("total-count"),
-      questionCount: document.getElementById("question-count"),
-      failedHint: document.getElementById("failed-hint"),
-      startBtn: document.getElementById("start-btn"),
-      progress: document.getElementById("progress"),
-      quizSection: document.getElementById("quiz-section"),
-      resultSection: document.getElementById("result-section"),
-      questionTitle: document.getElementById("question-title"),
-      questionIllustration: document.getElementById("question-illustration"),
-      optionsList: document.getElementById("options-list"),
-      resultShort: document.getElementById("result-short"),
-      resultIllustration: document.getElementById("result-illustration"),
-      resultDetailed: document.getElementById("result-detailed"),
-      resultExampleWrap: document.getElementById("result-example-wrap"),
-      nextBtn: document.getElementById("next-btn"),
-      sessionSummarySection: document.getElementById("session-summary-section"),
-      sessionStats: document.getElementById("session-stats"),
-      sessionFailedWrap: document.getElementById("session-failed-wrap"),
-      sessionFailedList: document.getElementById("session-failed-list"),
-      sessionNextTip: document.getElementById("session-next-tip"),
-      dashboardChart: document.getElementById("dashboard-chart"),
-      sessionChart: document.getElementById("session-chart"),
-      backToDashboardBtn: document.getElementById("back-to-dashboard-btn"),
-      themeToggle: document.getElementById("theme-toggle")
-    };
-
-    if (this.questions.length < 4) throw new Error("At least 4 questions are required for the quiz.");
-
-    var stored = localStorage.getItem(STORAGE_THEME_KEY);
-    var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.setAttribute("data-theme", stored || (prefersDark ? "dark" : "light"));
-    updateThemeIcon();
-
-    document.addEventListener("keydown", function (e) {
-      var tag = document.activeElement && document.activeElement.tagName;
-      var inInput = tag === "INPUT" || tag === "TEXTAREA";
-      if (e.key === "t" || e.key === "T") {
-        if (!inInput) { self.toggleTheme(); e.preventDefault(); }
-        return;
+      function escapeHtml(text) {
+        var div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
       }
-      if (e.key === "Enter" && !inInput) {
-        if (!self.el.dashboardSection.classList.contains("hidden")) {
-          self.startQuiz();
-          e.preventDefault();
+
+      function shuffle(array) {
+        var out = array.slice();
+        for (var i = out.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = out[i]; out[i] = out[j]; out[j] = t;
+        }
+        return out;
+      }
+
+      function pickWrongOptions(questions, correctQuestion, count) {
+        var others = questions.filter(function (q) { return q.id !== correctQuestion.id; });
+        return shuffle(others).slice(0, count).map(function (q) { return q.shortExplanation; });
+      }
+
+      function buildOptions(question, all) {
+        if (question.options && Array.isArray(question.options) && question.options.length === 4) {
+          return shuffle(question.options.slice());
+        }
+        var wrong = pickWrongOptions(all, question, 3);
+        var options = [{ text: question.shortExplanation, correct: true }].concat(wrong.map(function (text) { return { text: text, correct: false }; }));
+        return shuffle(options);
+      }
+
+      function parseFailedIds() {
+        try {
+          var raw = localStorage.getItem(STORAGE_FAILED_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch (e) { return []; }
+      }
+
+      function buildOrder(questions, count, failedIds) {
+        var total = questions.length;
+        var failedIndices = [];
+        var otherIndices = [];
+        for (var i = 0; i < total; i++) {
+          if (failedIds.indexOf(questions[i].id) !== -1) failedIndices.push(i);
+          else otherIndices.push(i);
+        }
+        return shuffle(failedIndices).concat(shuffle(otherIndices)).slice(0, count);
+      }
+
+      function QuizApp() {
+        var self = this;
+        this.questions = QUESTIONS.slice();
+        this.order = [];
+        this.selectedCount = 0;
+        this.index = 0;
+        this.currentOptions = [];
+        this.answered = false;
+        this.sessionResults = [];
+
+        this.el = {
+          dashboardSection: document.getElementById("dashboard-section"),
+          totalCount: document.getElementById("total-count"),
+          questionCount: document.getElementById("question-count"),
+          reviewCount: document.getElementById("review-count"),
+          startBtn: document.getElementById("start-btn"),
+          progress: document.getElementById("progress"),
+          quizSection: document.getElementById("quiz-section"),
+          resultSection: document.getElementById("result-section"),
+          questionTitle: document.getElementById("question-title"),
+          questionIllustration: document.getElementById("question-illustration"),
+          optionsList: document.getElementById("options-list"),
+          resultShort: document.getElementById("result-short"),
+          resultIllustration: document.getElementById("result-illustration"),
+          resultDetailed: document.getElementById("result-detailed"),
+          resultExampleWrap: document.getElementById("result-example-wrap"),
+          nextBtn: document.getElementById("next-btn"),
+          sessionSummarySection: document.getElementById("session-summary-section"),
+          sessionStats: document.getElementById("session-stats"),
+          sessionFailedWrap: document.getElementById("session-failed-wrap"),
+          sessionFailedList: document.getElementById("session-failed-list"),
+          sessionNextTip: document.getElementById("session-next-tip"),
+          dashboardChart: document.getElementById("dashboard-chart"),
+          sessionChart: document.getElementById("session-chart"),
+          backToDashboardBtn: document.getElementById("back-to-dashboard-btn"),
+          themeToggle: document.getElementById("theme-toggle")
+        };
+
+        if (this.questions.length < 4) throw new Error("At least 4 questions are required for the quiz.");
+
+        var stored = localStorage.getItem(STORAGE_THEME_KEY);
+        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.setAttribute("data-theme", stored || (prefersDark ? "dark" : "light"));
+        updateThemeIcon();
+
+        document.addEventListener("keydown", function (e) {
+          var tag = document.activeElement && document.activeElement.tagName;
+          var inInput = tag === "INPUT" || tag === "TEXTAREA";
+          if (e.key === "t" || e.key === "T") {
+            if (!inInput) { self.toggleTheme(); e.preventDefault(); }
+            return;
+          }
+          if (e.key === "Enter" && !inInput) {
+            if (!self.el.dashboardSection.classList.contains("hidden")) {
+              self.startQuiz();
+              e.preventDefault();
+              return;
+            }
+            if (self.answered && !self.el.resultSection.classList.contains("hidden")) {
+              self.next();
+              e.preventDefault();
+              return;
+            }
+          }
+          if (self.answered) return;
+          var n = parseInt(e.key, 10);
+          if (n >= 1 && n <= 4) {
+            var option = self.el.optionsList.querySelector("[data-index=\"" + (n - 1) + "\"]");
+            if (option && !option.classList.contains("option--disabled")) { option.click(); e.preventDefault(); }
+          }
+        });
+
+        this.el.themeToggle.addEventListener("click", function () { self.toggleTheme(); });
+        document.getElementById("dashboard-form").addEventListener("submit", function (e) { e.preventDefault(); self.startQuiz(); });
+        document.getElementById("result-form").addEventListener("submit", function (e) { e.preventDefault(); self.next(); });
+        this.el.backToDashboardBtn.addEventListener("click", function () { self.showDashboard(); });
+        if (window.matchMedia("(pointer: fine)").matches) {
+          self.el.themeToggle.setAttribute("title", "Toggle dark/light theme (keyboard: T)");
+          self.el.nextBtn.setAttribute("title", "Next question (keyboard: Enter)");
+        }
+        document.getElementById("tab-quiz").addEventListener("click", function () { self.showPage("quiz"); });
+        document.getElementById("tab-learn").addEventListener("click", function () { self.showPage("learn"); });
+        this.showPage("quiz");
+        this.showDashboard();
+      };
+
+      QuizApp.prototype.showPage = function (name) {
+        var quizTab = document.getElementById("tab-quiz");
+        var learnTab = document.getElementById("tab-learn");
+        var quizPage = document.getElementById("page-quiz");
+        var learnPage = document.getElementById("page-learn");
+        if (name === "quiz") {
+          quizTab.classList.add("active");
+          quizTab.setAttribute("aria-selected", "true");
+          learnTab.classList.remove("active");
+          learnTab.setAttribute("aria-selected", "false");
+          quizPage.classList.add("active");
+          quizPage.removeAttribute("hidden");
+          learnPage.classList.remove("active");
+          learnPage.setAttribute("hidden", "");
+        } else {
+          learnTab.classList.add("active");
+          learnTab.setAttribute("aria-selected", "true");
+          quizTab.classList.remove("active");
+          quizTab.setAttribute("aria-selected", "false");
+          learnPage.classList.add("active");
+          learnPage.removeAttribute("hidden");
+          quizPage.classList.remove("active");
+          quizPage.setAttribute("hidden", "");
+          this.renderLearnPage();
+          document.getElementById("learn-search-box").focus();
+        }
+      };
+
+      QuizApp.prototype.renderLearnPage = function () {
+        var listEl = document.getElementById("learn-list");
+        if (listEl.hasAttribute("data-rendered")) {
+          this.filterLearnList();
           return;
         }
-        if (self.answered && !self.el.resultSection.classList.contains("hidden")) {
-          self.next();
-          e.preventDefault();
-          return;
-        }
-      }
-      if (self.answered) return;
-      var n = parseInt(e.key, 10);
-      if (n >= 1 && n <= 4) {
-        var option = self.el.optionsList.querySelector("[data-index=\"" + (n - 1) + "\"]");
-        if (option && !option.classList.contains("option--disabled")) { option.click(); e.preventDefault(); }
-      }
-    });
-
-    this.el.themeToggle.addEventListener("click", function () { self.toggleTheme(); });
-    document.getElementById("dashboard-form").addEventListener("submit", function (e) { e.preventDefault(); self.startQuiz(); });
-    document.getElementById("result-form").addEventListener("submit", function (e) { e.preventDefault(); self.next(); });
-    this.el.backToDashboardBtn.addEventListener("click", function () { self.showDashboard(); });
-    if (window.matchMedia("(pointer: fine)").matches) {
-      self.el.themeToggle.setAttribute("title", "Toggle dark/light theme (keyboard: T)");
-      self.el.nextBtn.setAttribute("title", "Next question (keyboard: Enter)");
-    }
-    document.getElementById("tab-quiz").addEventListener("click", function () { self.showPage("quiz"); });
-    document.getElementById("tab-learn").addEventListener("click", function () { self.showPage("learn"); });
-    this.showPage("quiz");
-    this.showDashboard();
-  };
-
-  QuizApp.prototype.showPage = function (name) {
-    var quizTab = document.getElementById("tab-quiz");
-    var learnTab = document.getElementById("tab-learn");
-    var quizPage = document.getElementById("page-quiz");
-    var learnPage = document.getElementById("page-learn");
-    if (name === "quiz") {
-      quizTab.classList.add("active");
-      quizTab.setAttribute("aria-selected", "true");
-      learnTab.classList.remove("active");
-      learnTab.setAttribute("aria-selected", "false");
-      quizPage.classList.add("active");
-      quizPage.removeAttribute("hidden");
-      learnPage.classList.remove("active");
-      learnPage.setAttribute("hidden", "");
-    } else {
-      learnTab.classList.add("active");
-      learnTab.setAttribute("aria-selected", "true");
-      quizTab.classList.remove("active");
-      quizTab.setAttribute("aria-selected", "false");
-      learnPage.classList.add("active");
-      learnPage.removeAttribute("hidden");
-      quizPage.classList.remove("active");
-      quizPage.setAttribute("hidden", "");
-      this.renderLearnPage();
-      document.getElementById("learn-search-box").focus();
-    }
-  };
-
-  QuizApp.prototype.renderLearnPage = function () {
-    var listEl = document.getElementById("learn-list");
-    if (listEl.hasAttribute("data-rendered")) {
-      this.filterLearnList();
-      return;
-    }
-    listEl.setAttribute("data-rendered", "true");
-    var sorted = this.questions.slice().sort(function (a, b) { return a.priority - b.priority; });
-    for (var i = 0; i < sorted.length; i++) {
-      var q = sorted[i];
-      var plainDetail = (function () { var d = document.createElement("div"); d.innerHTML = q.detailedExplanation || ""; return (d.textContent || d.innerText || "").replace(/\s+/g, " ").trim(); })();
-      var searchText = (q.title + " " + plainDetail + (q.illustration ? " " + q.illustration : "")).toLowerCase();
-      var li = document.createElement("li");
-      li.className = "learn-item";
-      li.id = "learn-" + q.id;
-      li.setAttribute("data-search", searchText);
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "learn-btn";
-      btn.textContent = q.title;
-      var spoiler = document.createElement("div");
-      spoiler.className = "learn-spoiler";
-      var p = document.createElement("p");
-      p.className = "learn-detail";
-      p.innerHTML = q.detailedExplanation || "";
-      spoiler.appendChild(p);
-      if (q.illustration) {
-        var pre = document.createElement("pre");
-        pre.textContent = q.illustration;
-        spoiler.appendChild(pre);
-      }
-      li.appendChild(btn);
-      li.appendChild(spoiler);
-      listEl.appendChild(li);
-    }
-    var self = this;
-    listEl.querySelectorAll(".learn-btn").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var item = btn.closest(".learn-item");
-        item.classList.toggle("expanded");
-      });
-    });
-    document.getElementById("learn-collapse-btn").addEventListener("click", function () {
-      listEl.querySelectorAll(".learn-item.expanded").forEach(function (item) {
-        item.classList.remove("expanded");
-      });
-    });
-    document.getElementById("learn-expand-btn").addEventListener("click", function () {
-      listEl.querySelectorAll(".learn-item").forEach(function (item) {
-        if (!item.classList.contains("no-match")) item.classList.add("expanded");
-      });
-    });
-    var debounceFilter = debounce(function () { self.filterLearnList(); }, 150);
-    document.getElementById("learn-search-box").addEventListener("input", debounceFilter);
-    this.filterLearnList();
-  };
-
-  function debounce(fn, delay) {
-    var t = null;
-    return function () {
-      clearTimeout(t);
-      t = setTimeout(fn, delay);
-    };
-  }
-
-  QuizApp.prototype.filterLearnList = function () {
-    var searchBox = document.getElementById("learn-search-box");
-    var listEl = document.getElementById("learn-list");
-    var countEl = document.getElementById("learn-count");
-    var noResultsEl = document.getElementById("learn-no-results");
-    if (!searchBox || !listEl || !countEl) return;
-    var q = (searchBox.value || "").trim().toLowerCase();
-    var visible = 0;
-    listEl.querySelectorAll(".learn-item").forEach(function (item) {
-      var match = !q || item.getAttribute("data-search").indexOf(q) !== -1;
-      if (match) {
-        item.classList.remove("no-match");
-        visible++;
-      } else {
-        item.classList.add("no-match");
-      }
-    });
-    countEl.textContent = visible + " topic" + (visible !== 1 ? "s" : "");
-    if (noResultsEl) noResultsEl.classList.toggle("hidden", visible > 0);
-  };
-
-  QuizApp.prototype.toggleTheme = function () {
-    var current = document.documentElement.getAttribute("data-theme") || "light";
-    document.documentElement.setAttribute("data-theme", current === "dark" ? "light" : "dark");
-    localStorage.setItem(STORAGE_THEME_KEY, current === "dark" ? "light" : "dark");
-    updateThemeIcon();
-  };
-
-  function updateThemeIcon() {
-    var theme = document.documentElement.getAttribute("data-theme") || "light";
-    var btn = document.getElementById("theme-toggle");
-    if (btn) btn.textContent = theme === "dark" ? "\u263E" : "\u2600";
-  }
-
-  QuizApp.prototype.showDashboard = function () {
-    var total = this.questions.length;
-    this.el.totalCount.textContent = String(total);
-    var failedIds = parseFailedIds();
-    var failedCount = failedIds.length;
-    var restCount = Math.max(0, total - failedCount);
-    var failedPct = total > 0 ? (failedCount / total) * 100 : 0;
-    var restPct = total > 0 ? (restCount / total) * 100 : 0;
-    this.el.dashboardChart.innerHTML = "<div class=\"stats-chart-bar\" role=\"img\" aria-label=\"Quiz pool: " + failedCount + " to review, " + restCount + " rest\"><div class=\"stats-chart-segment segment-failed\" style=\"width:" + failedPct + "%\"></div><div class=\"stats-chart-segment segment-rest\" style=\"width:" + restPct + "%\"></div></div><p class=\"stats-chart-legend\"><span><span class=\"dot dot-failed\" aria-hidden=\"true\"></span>To review: " + failedCount + "</span><span><span class=\"dot dot-rest\" aria-hidden=\"true\"></span>Rest: " + restCount + "</span></p>";
-    this.el.questionCount.innerHTML = "";
-    var presets = [5, 10, 20, 50, 100];
-    for (var i = 0; i < presets.length; i++) {
-      var n = presets[i];
-      if (n <= total) {
-        var opt = document.createElement("option");
-        opt.value = n;
-        opt.textContent = String(n);
-        this.el.questionCount.appendChild(opt);
-      }
-    }
-    var allOpt = document.createElement("option");
-    allOpt.value = total;
-    allOpt.textContent = "All";
-    this.el.questionCount.appendChild(allOpt);
-    if (total > 0) this.el.questionCount.value = total >= 10 ? "10" : (total >= 5 ? "5" : String(total));
-    if (failedCount > 0) {
-      this.el.failedHint.textContent = failedCount + " question(s) need more practice. They will appear first in this try.";
-      this.el.failedHint.classList.remove("hidden");
-    } else {
-      this.el.failedHint.classList.add("hidden");
-    }
-    this.el.dashboardSection.classList.remove("hidden");
-    this.el.quizSection.classList.add("hidden");
-    this.el.resultSection.classList.add("hidden");
-    this.el.sessionSummarySection.classList.add("hidden");
-  };
-
-  QuizApp.prototype.startQuiz = function () {
-    var count = parseInt(this.el.questionCount.value, 10) || this.questions.length;
-    count = Math.max(1, Math.min(count, this.questions.length));
-    var failedIds = parseFailedIds();
-    this.order = buildOrder(this.questions, count, failedIds);
-    this.selectedCount = this.order.length;
-    this.index = 0;
-    this.sessionResults = [];
-    this.el.dashboardSection.classList.add("hidden");
-    this.el.quizSection.classList.remove("hidden");
-    this.el.sessionSummarySection.classList.add("hidden");
-    this.showQuestion();
-  };
-
-  QuizApp.prototype.getSessionStats = function () {
-    var correct = 0, wrong = 0, failedIds = [];
-    for (var i = 0; i < this.sessionResults.length; i++) {
-      if (this.sessionResults[i].correct) correct++; else { wrong++; failedIds.push(this.sessionResults[i].id); }
-    }
-    return { correct: correct, wrong: wrong, failedIds: failedIds };
-  };
-
-  QuizApp.prototype.showSessionSummary = function () {
-    var stats = this.getSessionStats();
-    localStorage.setItem(STORAGE_FAILED_KEY, JSON.stringify(stats.failedIds));
-    var total = this.sessionResults.length;
-    var correctPct = total > 0 ? (stats.correct / total) * 100 : 0;
-    var wrongPct = total > 0 ? (stats.wrong / total) * 100 : 0;
-    this.el.sessionChart.innerHTML = "<div class=\"stats-chart-bar\" role=\"img\" aria-label=\"Correct: " + stats.correct + ", Wrong: " + stats.wrong + "\"><div class=\"stats-chart-segment segment-correct\" style=\"width:" + correctPct + "%\"></div><div class=\"stats-chart-segment segment-wrong\" style=\"width:" + wrongPct + "%\"></div></div><p class=\"stats-chart-legend\"><span><span class=\"dot dot-correct\" aria-hidden=\"true\"></span>Correct: " + stats.correct + "</span><span><span class=\"dot dot-wrong\" aria-hidden=\"true\"></span>Wrong: " + stats.wrong + "</span></p>";
-    var pct = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
-    this.el.sessionStats.textContent = "Correct: " + stats.correct + " · Wrong: " + stats.wrong + " (of " + total + ") — " + pct + "%";
-    if (stats.failedIds.length > 0) {
-      this.el.sessionFailedWrap.classList.remove("hidden");
-      this.el.sessionFailedList.innerHTML = "";
-      var self = this;
-      stats.failedIds.forEach(function (id) {
-        var q = self.questions.filter(function (q) { return q.id === id; })[0];
-        if (q) {
+        listEl.setAttribute("data-rendered", "true");
+        var sorted = this.questions.slice().sort(function (a, b) { return a.priority - b.priority; });
+        for (var i = 0; i < sorted.length; i++) {
+          var q = sorted[i];
+          var plainDetail = (function () { var d = document.createElement("div"); d.innerHTML = q.detailedExplanation || ""; return (d.textContent || d.innerText || "").replace(/\s+/g, " ").trim(); })();
+          var searchText = (q.title + " " + plainDetail + (q.illustration ? " " + q.illustration : "")).toLowerCase();
           var li = document.createElement("li");
-          li.textContent = q.title;
-          self.el.sessionFailedList.appendChild(li);
+          li.className = "learn-item";
+          li.id = "learn-" + q.id;
+          li.setAttribute("data-search", searchText);
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "learn-btn";
+          btn.textContent = q.title;
+          var spoiler = document.createElement("div");
+          spoiler.className = "learn-spoiler";
+          var p = document.createElement("p");
+          p.className = "learn-detail";
+          p.innerHTML = q.detailedExplanation || "";
+          spoiler.appendChild(p);
+          if (q.illustration) {
+            var pre = document.createElement("pre");
+            pre.textContent = q.illustration;
+            spoiler.appendChild(pre);
+          }
+          li.appendChild(btn);
+          li.appendChild(spoiler);
+          listEl.appendChild(li);
         }
-      });
-      this.el.sessionNextTip.textContent = "These will be suggested first when you start your next try.";
-    } else {
-      this.el.sessionFailedWrap.classList.add("hidden");
-      this.el.sessionNextTip.textContent = "Great — no failed questions this time.";
-    }
-    this.el.quizSection.classList.add("hidden");
-    this.el.resultSection.classList.add("hidden");
-    this.el.sessionSummarySection.classList.remove("hidden");
-    this.el.backToDashboardBtn.focus();
-  };
+        var self = this;
+        listEl.querySelectorAll(".learn-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var item = btn.closest(".learn-item");
+            item.classList.toggle("expanded");
+          });
+        });
+        document.getElementById("learn-collapse-btn").addEventListener("click", function () {
+          listEl.querySelectorAll(".learn-item.expanded").forEach(function (item) {
+            item.classList.remove("expanded");
+          });
+        });
+        document.getElementById("learn-expand-btn").addEventListener("click", function () {
+          listEl.querySelectorAll(".learn-item").forEach(function (item) {
+            if (!item.classList.contains("no-match")) item.classList.add("expanded");
+          });
+        });
+        var debounceFilter = debounce(function () { self.filterLearnList(); }, 150);
+        document.getElementById("learn-search-box").addEventListener("input", debounceFilter);
+        this.filterLearnList();
+      };
 
-  QuizApp.prototype.showQuestion = function () {
-    this.answered = false;
-    var q = this.questions[this.order[this.index]];
-    this.currentOptions = buildOptions(q, this.questions);
+      function debounce(fn, delay) {
+        var t = null;
+        return function () {
+          clearTimeout(t);
+          t = setTimeout(fn, delay);
+        };
+      }
 
-    var correctSoFar = 0, wrongSoFar = 0;
-    for (var i = 0; i < this.sessionResults.length; i++) {
-      if (this.sessionResults[i].correct) correctSoFar++; else wrongSoFar++;
-    }
-    this.el.progress.innerHTML = "Question " + (this.index + 1) + " of " + this.order.length + " · <span class=\"quiz-stats\">Correct: <span class=\"correct-num\">" + correctSoFar + "</span> · Wrong: <span class=\"wrong-num\">" + wrongSoFar + "</span></span>";
-    this.el.questionTitle.textContent = q.title;
-    this.el.questionIllustration.textContent = "";
+      QuizApp.prototype.filterLearnList = function () {
+        var searchBox = document.getElementById("learn-search-box");
+        var listEl = document.getElementById("learn-list");
+        var countEl = document.getElementById("learn-count");
+        var noResultsEl = document.getElementById("learn-no-results");
+        if (!searchBox || !listEl || !countEl) return;
+        var q = (searchBox.value || "").trim().toLowerCase();
+        var visible = 0;
+        listEl.querySelectorAll(".learn-item").forEach(function (item) {
+          var match = !q || item.getAttribute("data-search").indexOf(q) !== -1;
+          if (match) {
+            item.classList.remove("no-match");
+            visible++;
+          } else {
+            item.classList.add("no-match");
+          }
+        });
+        countEl.textContent = visible + " topic" + (visible !== 1 ? "s" : "");
+        if (noResultsEl) noResultsEl.classList.toggle("hidden", visible > 0);
+      };
 
-    this.el.optionsList.innerHTML = "";
-    var self = this;
-    this.currentOptions.forEach(function (opt, i) {
-      var li = document.createElement("li");
-      li.setAttribute("role", "option");
-      li.setAttribute("data-index", String(i));
-      li.className = "option";
-      li.innerHTML = "<span class=\"option-num\" aria-hidden=\"true\">" + (i + 1) + ".</span> " + escapeHtml(opt.text);
-      li.addEventListener("click", function () { self.selectOption(i); });
-      self.el.optionsList.appendChild(li);
-    });
+      QuizApp.prototype.toggleTheme = function () {
+        var current = document.documentElement.getAttribute("data-theme") || "light";
+        document.documentElement.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+        localStorage.setItem(STORAGE_THEME_KEY, current === "dark" ? "light" : "dark");
+        updateThemeIcon();
+      };
 
-    this.el.quizSection.classList.remove("hidden");
-    this.el.resultSection.classList.add("hidden");
-    this.el.resultSection.classList.remove("result-section--correct", "result-section--wrong");
-    var isLast = this.index >= this.order.length - 1;
-    this.el.nextBtn.textContent = isLast ? "Finish" : "Next question";
-  };
+      function updateThemeIcon() {
+        var theme = document.documentElement.getAttribute("data-theme") || "light";
+        var btn = document.getElementById("theme-toggle");
+        if (btn) btn.textContent = theme === "dark" ? "\u263E" : "\u2600";
+      }
 
-  QuizApp.prototype.selectOption = function (optionIndex) {
-    if (this.answered) return;
-    this.answered = true;
+      QuizApp.prototype.showDashboard = function () {
+        var total = this.questions.length;
+        this.el.totalCount.textContent = String(total);
+        var failedIds = parseFailedIds();
+        var failedCount = failedIds.length;
+        var restCount = Math.max(0, total - failedCount);
+        var failedPct = total > 0 ? (failedCount / total) * 100 : 0;
+        var restPct = total > 0 ? (restCount / total) * 100 : 0;
+        this.el.reviewCount.textContent = String(failedCount);
+        this.el.dashboardChart.innerHTML = "<div class=\"stats-chart-bar\" role=\"img\" aria-label=\"Quiz pool: " + failedCount + " to review, " + restCount + " rest\"><div class=\"stats-chart-segment segment-failed\" style=\"width:" + failedPct + "%\"></div><div class=\"stats-chart-segment segment-rest\" style=\"width:" + restPct + "%\"></div></div><p class=\"stats-chart-legend\"><span><span class=\"dot dot-failed\" aria-hidden=\"true\"></span>To review: " + failedCount + "</span><span><span class=\"dot dot-rest\" aria-hidden=\"true\"></span>Rest: " + restCount + "</span></p>";
+        this.el.questionCount.innerHTML = "";
+        var presets = [5, 10, 20, 50, 100];
+        for (var i = 0; i < presets.length; i++) {
+          var n = presets[i];
+          if (n <= total) {
+            var opt = document.createElement("option");
+            opt.value = n;
+            opt.textContent = String(n);
+            this.el.questionCount.appendChild(opt);
+          }
+        }
+        var allOpt = document.createElement("option");
+        allOpt.value = total;
+        allOpt.textContent = "All";
+        this.el.questionCount.appendChild(allOpt);
+        if (total > 0) this.el.questionCount.value = total >= 10 ? "10" : (total >= 5 ? "5" : String(total));
+        this.el.dashboardSection.classList.remove("hidden");
+        this.el.quizSection.classList.add("hidden");
+        this.el.resultSection.classList.add("hidden");
+        this.el.sessionSummarySection.classList.add("hidden");
+      };
 
-    var opt = this.currentOptions[optionIndex];
-    var optionElements = this.el.optionsList.querySelectorAll(".option");
-    for (var i = 0; i < optionElements.length; i++) {
-      var item = optionElements[i];
-      item.classList.add("option--disabled");
-      if (this.currentOptions[i].correct) item.classList.add("option--correct");
-      else if (i === optionIndex) item.classList.add("option--wrong");
-    }
+      QuizApp.prototype.startQuiz = function () {
+        var count = parseInt(this.el.questionCount.value, 10) || this.questions.length;
+        count = Math.max(1, Math.min(count, this.questions.length));
+        var failedIds = parseFailedIds();
+        this.order = buildOrder(this.questions, count, failedIds);
+        this.selectedCount = this.order.length;
+        this.index = 0;
+        this.sessionResults = [];
+        this.el.dashboardSection.classList.add("hidden");
+        this.el.quizSection.classList.remove("hidden");
+        this.el.sessionSummarySection.classList.add("hidden");
+        this.showQuestion();
+      };
 
-    var q = this.questions[this.order[this.index]];
-    this.sessionResults.push({ id: q.id, correct: opt.correct });
-    this.el.resultSection.classList.remove("result-section--correct", "result-section--wrong");
-    this.el.resultSection.classList.add(opt.correct ? "result-section--correct" : "result-section--wrong");
-    this.el.resultShort.textContent = q.shortExplanation;
-    this.el.resultIllustration.textContent = q.illustration || "";
-    if (this.el.resultExampleWrap) this.el.resultExampleWrap.classList.toggle("hidden", !q.illustration);
-    var detailText = q.detailedExplanation || "";
-    detailText = detailText.replace(/^\s*Correcto\s*:\s*/i, "La respuesta correcta es: ");
-    this.el.resultDetailed.innerHTML = detailText;
+      QuizApp.prototype.getSessionStats = function () {
+        var correct = 0, wrong = 0, failedIds = [];
+        for (var i = 0; i < this.sessionResults.length; i++) {
+          if (this.sessionResults[i].correct) correct++; else { wrong++; failedIds.push(this.sessionResults[i].id); }
+        }
+        return { correct: correct, wrong: wrong, failedIds: failedIds };
+      };
 
-    this.el.resultSection.classList.remove("hidden");
-    this.el.nextBtn.disabled = false;
-    this.el.nextBtn.focus();
-    this.el.nextBtn.scrollIntoView({ behavior: "smooth", block: "end" });
-  };
+      QuizApp.prototype.showSessionSummary = function () {
+        var stats = this.getSessionStats();
+        localStorage.setItem(STORAGE_FAILED_KEY, JSON.stringify(stats.failedIds));
+        var total = this.sessionResults.length;
+        var correctPct = total > 0 ? (stats.correct / total) * 100 : 0;
+        var wrongPct = total > 0 ? (stats.wrong / total) * 100 : 0;
+        this.el.sessionChart.innerHTML = "<div class=\"stats-chart-bar\" role=\"img\" aria-label=\"Correct: " + stats.correct + ", Wrong: " + stats.wrong + "\"><div class=\"stats-chart-segment segment-correct\" style=\"width:" + correctPct + "%\"></div><div class=\"stats-chart-segment segment-wrong\" style=\"width:" + wrongPct + "%\"></div></div><p class=\"stats-chart-legend\"><span><span class=\"dot dot-correct\" aria-hidden=\"true\"></span>Correct: " + stats.correct + "</span><span><span class=\"dot dot-wrong\" aria-hidden=\"true\"></span>Wrong: " + stats.wrong + "</span></p>";
+        var pct = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
+        this.el.sessionStats.textContent = "Correct: " + stats.correct + " · Wrong: " + stats.wrong + " (of " + total + ") — " + pct + "%";
+        if (stats.failedIds.length > 0) {
+          this.el.sessionFailedWrap.classList.remove("hidden");
+          this.el.sessionFailedList.innerHTML = "";
+          var self = this;
+          stats.failedIds.forEach(function (id) {
+            var q = self.questions.filter(function (q) { return q.id === id; })[0];
+            if (q) {
+              var li = document.createElement("li");
+              li.textContent = q.title;
+              self.el.sessionFailedList.appendChild(li);
+            }
+          });
+          this.el.sessionNextTip.textContent = "These will be suggested first when you start your next try.";
+        } else {
+          this.el.sessionFailedWrap.classList.add("hidden");
+          this.el.sessionNextTip.textContent = "Great — no failed questions this time.";
+        }
+        this.el.quizSection.classList.add("hidden");
+        this.el.resultSection.classList.add("hidden");
+        this.el.sessionSummarySection.classList.remove("hidden");
+        this.el.backToDashboardBtn.focus();
+      };
 
-  QuizApp.prototype.next = function () {
-    this.index++;
-    if (this.index >= this.order.length) {
-      this.showSessionSummary();
-      return;
-    }
-    this.showQuestion();
-  };
+      QuizApp.prototype.showQuestion = function () {
+        this.answered = false;
+        var q = this.questions[this.order[this.index]];
+        this.currentOptions = buildOptions(q, this.questions);
 
-  document.addEventListener("DOMContentLoaded", function () { new QuizApp(); });
-})();
+        var correctSoFar = 0, wrongSoFar = 0;
+        for (var i = 0; i < this.sessionResults.length; i++) {
+          if (this.sessionResults[i].correct) correctSoFar++; else wrongSoFar++;
+        }
+        this.el.progress.innerHTML = "Question " + (this.index + 1) + " of " + this.order.length + " · <span class=\"quiz-stats\">Correct: <span class=\"correct-num\">" + correctSoFar + "</span> · Wrong: <span class=\"wrong-num\">" + wrongSoFar + "</span></span>";
+        this.el.questionTitle.textContent = q.title;
+        this.el.questionIllustration.textContent = "";
+
+        this.el.optionsList.innerHTML = "";
+        var self = this;
+        this.currentOptions.forEach(function (opt, i) {
+          var li = document.createElement("li");
+          li.setAttribute("role", "option");
+          li.setAttribute("data-index", String(i));
+          li.className = "option";
+          li.innerHTML = "<span class=\"option-num\" aria-hidden=\"true\">" + (i + 1) + ".</span> " + escapeHtml(opt.text);
+          li.addEventListener("click", function () { self.selectOption(i); });
+          self.el.optionsList.appendChild(li);
+        });
+
+        this.el.quizSection.classList.remove("hidden");
+        this.el.resultSection.classList.add("hidden");
+        this.el.resultSection.classList.remove("result-section--correct", "result-section--wrong");
+        var isLast = this.index >= this.order.length - 1;
+        this.el.nextBtn.textContent = isLast ? "Finish" : "Next question";
+      };
+
+      QuizApp.prototype.selectOption = function (optionIndex) {
+        if (this.answered) return;
+        this.answered = true;
+
+        var opt = this.currentOptions[optionIndex];
+        var optionElements = this.el.optionsList.querySelectorAll(".option");
+        for (var i = 0; i < optionElements.length; i++) {
+          var item = optionElements[i];
+          item.classList.add("option--disabled");
+          if (this.currentOptions[i].correct) item.classList.add("option--correct");
+          else if (i === optionIndex) item.classList.add("option--wrong");
+        }
+
+        var q = this.questions[this.order[this.index]];
+        this.sessionResults.push({ id: q.id, correct: opt.correct });
+        this.el.resultSection.classList.remove("result-section--correct", "result-section--wrong");
+        this.el.resultSection.classList.add(opt.correct ? "result-section--correct" : "result-section--wrong");
+        this.el.resultShort.textContent = q.shortExplanation;
+        this.el.resultIllustration.textContent = q.illustration || "";
+        if (this.el.resultExampleWrap) this.el.resultExampleWrap.classList.toggle("hidden", !q.illustration);
+        var detailText = q.detailedExplanation || "";
+        detailText = detailText.replace(/^\s*Correcto\s*:\s*/i, "La respuesta correcta es: ");
+        this.el.resultDetailed.innerHTML = detailText;
+
+        this.el.resultSection.classList.remove("hidden");
+        this.el.nextBtn.disabled = false;
+        this.el.nextBtn.focus();
+        this.el.nextBtn.scrollIntoView({ behavior: "smooth", block: "end" });
+      };
+
+      QuizApp.prototype.next = function () {
+        this.index++;
+        if (this.index >= this.order.length) {
+          this.showSessionSummary();
+          return;
+        }
+        this.showQuestion();
+      };
+
+      document.addEventListener("DOMContentLoaded", function () { new QuizApp(); });
+    })();
   </script>
 </body>
+
 </html>
