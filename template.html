@@ -83,16 +83,17 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;bac
 .option--disabled{cursor:default;opacity:0.85;}
 .option--correct{border-color:var(--correct);background:rgba(21,128,61,0.12);}
 .option--wrong{border-color:var(--wrong);background:rgba(185,28,28,0.12);}
-.result-section{background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:1.25rem;box-shadow:0 2px 8px var(--shadow);position:relative;}
+.result-section{background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:1.25rem;margin-top:1.25rem;box-shadow:0 2px 8px var(--shadow);position:relative;}
 .result-section.hidden{display:none;}
+.result-section.result-section--correct{border-color:var(--correct);}
+.result-section.result-section--wrong{border-color:var(--wrong);}
 .result-actions{margin-top:1rem;position:relative;z-index:2;cursor:pointer;}
 .result-section .btn-primary{position:relative;z-index:2;cursor:pointer;pointer-events:auto;}
-.result-badge{margin-bottom:1rem;padding:0.5rem 0.75rem;border-radius:0.375rem;font-weight:600;font-size:0.875rem;}
-.result-badge--correct{background:rgba(21,128,61,0.2);color:var(--correct);}
-.result-badge--wrong{background:rgba(185,28,28,0.2);color:var(--wrong);}
 .result-title{margin:0 0 0.75rem;font-size:1.25rem;font-weight:600;}
-.result-heading{margin:1rem 0 0.25rem;font-size:0.875rem;font-weight:600;color:var(--text-muted);}
-.result-heading:first-of-type{margin-top:0;}
+.result-detail-block{margin-top:1.25rem;}
+.result-detail-block:first-child{margin-top:0;}
+.result-heading{margin:0 0 0.5rem;padding-bottom:0.35rem;border-bottom:1px solid var(--border);font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);}
+.result-example-wrap .result-heading{border-bottom:none;padding-bottom:0;}
 .result-text{margin:0;font-size:0.9375rem;}
 .result-detailed{color:var(--text-muted);}
 .btn{min-height:2.75rem;padding:0.75rem 1.25rem;font-size:1rem;font-weight:500;border:none;border-radius:0.375rem;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
@@ -145,6 +146,7 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
 .learn-item.expanded .learn-spoiler{display:block;}
 .learn-spoiler p{margin:0.5rem 0 0;font-size:0.9375rem;color:var(--text);line-height:1.5;}
 .learn-spoiler p:first-child{margin-top:0;}
+.learn-spoiler .learn-detail{white-space:pre-line;}
 .learn-spoiler pre{margin:0.75rem 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:0.8125rem;line-height:1.45;white-space:pre-wrap;word-break:break-word;padding:0.875rem 1rem;background:var(--code-bg);border:1px solid var(--code-border);border-radius:0.375rem;overflow-x:auto;}
 .hidden{display:none!important;}
   </style>
@@ -185,14 +187,19 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
         </article>
       </section>
       <section id="result-section" class="result-section hidden" aria-live="polite">
-        <div id="result-badge" class="result-badge"></div>
         <article id="result-card" class="result-card">
-          <h2 id="result-title" class="result-title"></h2>
-          <div id="result-illustration" class="result-illustration" aria-hidden="true"></div>
-          <h3 class="result-heading">Short explanation</h3>
-          <p id="result-short" class="result-text"></p>
-          <h3 class="result-heading">Detailed explanation</h3>
-          <p id="result-detailed" class="result-text result-detailed"></p>
+          <div class="result-detail-block">
+            <h3 class="result-heading">Short explanation</h3>
+            <p id="result-short" class="result-text"></p>
+          </div>
+          <div class="result-detail-block">
+            <h3 class="result-heading">Detailed explanation</h3>
+            <p id="result-detailed" class="result-text result-detailed"></p>
+          </div>
+          <div id="result-example-wrap" class="result-detail-block result-example-wrap hidden">
+            <h3 class="result-heading">Example</h3>
+            <div id="result-illustration" class="result-illustration" aria-hidden="true"></div>
+          </div>
         </article>
         <form id="result-form" class="result-actions">
           <button type="submit" id="next-btn" class="btn btn-primary">Next question</button>
@@ -319,11 +326,10 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
       questionTitle: document.getElementById("question-title"),
       questionIllustration: document.getElementById("question-illustration"),
       optionsList: document.getElementById("options-list"),
-      resultBadge: document.getElementById("result-badge"),
-      resultTitle: document.getElementById("result-title"),
-      resultIllustration: document.getElementById("result-illustration"),
       resultShort: document.getElementById("result-short"),
+      resultIllustration: document.getElementById("result-illustration"),
       resultDetailed: document.getElementById("result-detailed"),
+      resultExampleWrap: document.getElementById("result-example-wrap"),
       nextBtn: document.getElementById("next-btn"),
       sessionSummarySection: document.getElementById("session-summary-section"),
       sessionStats: document.getElementById("session-stats"),
@@ -422,7 +428,8 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
     var sorted = this.questions.slice().sort(function (a, b) { return a.priority - b.priority; });
     for (var i = 0; i < sorted.length; i++) {
       var q = sorted[i];
-      var searchText = (q.title + " " + q.detailedExplanation + (q.illustration ? " " + q.illustration : "")).toLowerCase();
+      var plainDetail = (function () { var d = document.createElement("div"); d.innerHTML = q.detailedExplanation || ""; return (d.textContent || d.innerText || "").replace(/\s+/g, " ").trim(); })();
+      var searchText = (q.title + " " + plainDetail + (q.illustration ? " " + q.illustration : "")).toLowerCase();
       var li = document.createElement("li");
       li.className = "learn-item";
       li.id = "learn-" + q.id;
@@ -434,7 +441,8 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
       var spoiler = document.createElement("div");
       spoiler.className = "learn-spoiler";
       var p = document.createElement("p");
-      p.textContent = q.detailedExplanation;
+      p.className = "learn-detail";
+      p.innerHTML = q.detailedExplanation || "";
       spoiler.appendChild(p);
       if (q.illustration) {
         var pre = document.createElement("pre");
@@ -525,7 +533,7 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
       opt.textContent = n === total ? n + " (all)" : String(n);
       this.el.questionCount.appendChild(opt);
     }
-    if (total > 0) this.el.questionCount.value = Math.min(5, total);
+    if (total > 0) this.el.questionCount.value = Math.min(10, total);
     if (failedCount > 0) {
       this.el.failedHint.textContent = failedCount + " question(s) need more practice. They will appear first in this try.";
       this.el.failedHint.classList.remove("hidden");
@@ -619,6 +627,7 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
 
     this.el.quizSection.classList.remove("hidden");
     this.el.resultSection.classList.add("hidden");
+    this.el.resultSection.classList.remove("result-section--correct", "result-section--wrong");
     var isLast = this.index >= this.order.length - 1;
     this.el.nextBtn.textContent = isLast ? "Finish" : "Next question";
   };
@@ -638,11 +647,11 @@ kbd{padding:0.125rem 0.375rem;font-size:0.7em;background:var(--surface);border:1
 
     var q = this.questions[this.order[this.index]];
     this.sessionResults.push({ id: q.id, correct: opt.correct });
-    this.el.resultBadge.textContent = opt.correct ? "Correct" : "Wrong";
-    this.el.resultBadge.className = "result-badge " + (opt.correct ? "result-badge--correct" : "result-badge--wrong");
-    this.el.resultTitle.textContent = q.title;
-    this.el.resultIllustration.textContent = q.illustration || "";
+    this.el.resultSection.classList.remove("result-section--correct", "result-section--wrong");
+    this.el.resultSection.classList.add(opt.correct ? "result-section--correct" : "result-section--wrong");
     this.el.resultShort.textContent = q.shortExplanation;
+    this.el.resultIllustration.textContent = q.illustration || "";
+    if (this.el.resultExampleWrap) this.el.resultExampleWrap.classList.toggle("hidden", !q.illustration);
     this.el.resultDetailed.textContent = q.detailedExplanation;
 
     this.el.quizSection.classList.add("hidden");
